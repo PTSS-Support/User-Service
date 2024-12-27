@@ -7,19 +7,19 @@ import jakarta.persistence.*
 @Entity
 @Table(name = "users")
 class UserEntity : BaseEntity() {
-    @Column(name = "keycloak_id", nullable = false, unique = true, updatable = false)
+    @Column(nullable = false, unique = true, updatable = false)
     lateinit var keycloakId: UUID
 
-    @Column(name = "first_name", nullable = false, length = 64)
+    @Column(nullable = false, length = 64)
     lateinit var firstName: String
 
-    @Column(name = "last_name", nullable = false, length = 64)
+    @Column(nullable = false, length = 64)
     lateinit var lastName: String
 
-    @Column(name = "last_seen", nullable = false)
+    @Column(nullable = false)
     var lastSeen: OffsetDateTime = OffsetDateTime.now()
 
     // Navigate from User to their family memberships
-    @OneToMany(mappedBy = "userId")
+    @OneToMany(mappedBy = "user")
     val groupFamilyMemberships: Set<GroupFamilyMemberEntity> = HashSet()
 }

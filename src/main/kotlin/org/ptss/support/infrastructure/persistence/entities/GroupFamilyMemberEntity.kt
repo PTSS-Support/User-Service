@@ -7,15 +7,15 @@ import java.util.*
 @Table(
     name = "group_family_members",
     uniqueConstraints = [
-        UniqueConstraint(columnNames = ["user_id"])
+        UniqueConstraint(columnNames = ["user"])
     ]
 )
 class GroupFamilyMemberEntity : BaseEntity() {
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "group_id", nullable = false, updatable = false)
+    @JoinColumn(nullable = false, updatable = false)
     lateinit var group: GroupEntity
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false, updatable = false)
+    @JoinColumn(nullable = false, updatable = false)
     lateinit var user: UserEntity
 }

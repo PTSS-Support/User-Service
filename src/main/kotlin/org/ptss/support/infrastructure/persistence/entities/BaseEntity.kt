@@ -9,19 +9,22 @@ import java.util.*
 
 @MappedSuperclass
 abstract class BaseEntity : PanacheEntityBase {
+    // Optimistic locking with @Version
+    // Prevents concurrent modifications by different transactions
+    // Throws OptimisticLockException which should be handled by a retry with an exponential backoff strategy
+    @Version
+    var version: Long = 0
+
     @Id
-    @Column(name = "id")
     lateinit var id: UUID
 
     // Database-managed
     // Primarily used for auditing purposes
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
     lateinit var createdAt: OffsetDateTime
 
     // Database-managed
     // Primarily used for auditing purposes
     @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
     lateinit var updatedAt: OffsetDateTime
 }

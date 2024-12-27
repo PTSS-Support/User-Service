@@ -8,8 +8,8 @@ import org.hibernate.annotations.Check
 @Table(
     name = "groups",
     uniqueConstraints = [
-        UniqueConstraint(columnNames = ["patient_id"]),
-        UniqueConstraint(columnNames = ["primary_caregiver_id"])
+        UniqueConstraint(columnNames = ["patient"]),
+        UniqueConstraint(columnNames = ["primaryCaregiver"])
     ]
 )
 // Ensures patient, healthcare professional, and caregiver IDs are distinct in the database
@@ -22,15 +22,15 @@ import org.hibernate.annotations.Check
 )
 class GroupEntity : BaseEntity() {
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "patient_id", nullable = false, updatable = false)
+    @JoinColumn(nullable = false, updatable = false)
     lateinit var patient: UserEntity
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "healthcare_prof_id", nullable = false)
+    @JoinColumn(nullable = false)
     lateinit var healthcareProfessional: UserEntity
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "primary_caregiver_id")
+    @JoinColumn
     var primaryCaregiver: UserEntity? = null
 
     @OneToMany(mappedBy = "group")
