@@ -1,6 +1,5 @@
 package org.ptss.support.api.dtos.responses.users
 
-import org.ptss.support.common.pagination.CursorPage
 import java.util.UUID
 import java.time.OffsetDateTime
 

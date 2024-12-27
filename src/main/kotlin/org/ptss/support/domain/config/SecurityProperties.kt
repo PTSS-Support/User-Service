@@ -1,9 +1,8 @@
-package org.ptss.support.security
+package org.ptss.support.domain.config
 
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 import org.eclipse.microprofile.config.inject.ConfigProperty
-
 
 @ApplicationScoped
 class SecurityProperties @Inject constructor(
