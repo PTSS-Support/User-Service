@@ -12,6 +12,7 @@ import org.hibernate.annotations.Check
         UniqueConstraint(columnNames = ["primary_caregiver_id"])
     ]
 )
+// Ensures patient, healthcare professional, and caregiver IDs are distinct in the database
 @Check(
     constraints = """
         patient_id != healthcare_prof_id AND 
@@ -20,16 +21,18 @@ import org.hibernate.annotations.Check
     """
 )
 class GroupEntity : BaseEntity() {
-    @Id
-    @Column(name = "id")
-    lateinit var id: UUID
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "patient_id", nullable = false, updatable = false)
+    lateinit var patient: UserEntity
 
-    @Column(name = "patient_id", nullable = false)
-    lateinit var patientId: UUID
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "healthcare_prof_id", nullable = false)
+    lateinit var healthcareProfessional: UserEntity
 
-    @Column(name = "healthcare_prof_id", nullable = false)
-    lateinit var healthcareProfessionalId: UUID
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "primary_caregiver_id")
+    var primaryCaregiver: UserEntity? = null
 
-    @Column(name = "primary_caregiver_id")
-    var primaryCaregiverId: UUID? = null
+    @OneToMany(mappedBy = "group")
+    val familyMembers: Set<GroupFamilyMemberEntity> = HashSet()
 }

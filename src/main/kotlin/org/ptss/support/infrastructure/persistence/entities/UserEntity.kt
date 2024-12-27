@@ -1,26 +1,25 @@
 package org.ptss.support.infrastructure.persistence.entities
 
-import io.quarkus.hibernate.orm.panache.kotlin.PanacheEntityBase
 import java.util.UUID
 import java.time.OffsetDateTime
 import jakarta.persistence.*
 
 @Entity
 @Table(name = "users")
-class UserEntity : PanacheEntityBase {
-    @Id
-    @Column(name = "id")
-    lateinit var id: UUID
+class UserEntity : BaseEntity() {
+    @Column(name = "keycloak_id", nullable = false, unique = true, updatable = false)
+    lateinit var keycloakId: UUID
 
-    @Column(name = "keycloak_id", nullable = false, unique = true)
-    lateinit var keycloakId: String
-
-    @Column(name = "first_name", nullable = false)
+    @Column(name = "first_name", nullable = false, length = 64)
     lateinit var firstName: String
 
-    @Column(name = "last_name", nullable = false)
+    @Column(name = "last_name", nullable = false, length = 64)
     lateinit var lastName: String
 
-    @Column(name = "last_seen")
-    var lastSeen: OffsetDateTime? = null
+    @Column(name = "last_seen", nullable = false)
+    var lastSeen: OffsetDateTime = OffsetDateTime.now()
+
+    // Navigate from User to their family memberships
+    @OneToMany(mappedBy = "userId")
+    val groupFamilyMemberships: Set<GroupFamilyMemberEntity> = HashSet()
 }

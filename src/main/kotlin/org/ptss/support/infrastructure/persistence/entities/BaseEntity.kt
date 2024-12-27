@@ -5,9 +5,14 @@ import java.time.OffsetDateTime
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
+import java.util.*
 
 @MappedSuperclass
 abstract class BaseEntity : PanacheEntityBase {
+    @Id
+    @Column(name = "id")
+    lateinit var id: UUID
+
     // Database-managed
     // Primarily used for auditing purposes
     @CreationTimestamp

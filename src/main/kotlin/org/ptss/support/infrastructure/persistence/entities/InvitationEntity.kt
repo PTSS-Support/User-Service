@@ -4,6 +4,8 @@ import io.quarkus.hibernate.orm.panache.kotlin.PanacheCompanion
 import java.time.OffsetDateTime
 import java.util.UUID
 import jakarta.persistence.*
+import jakarta.validation.constraints.Pattern
+import org.ptss.support.domain.enums.Role
 
 @Entity
 @Table(
@@ -13,21 +15,19 @@ import jakarta.persistence.*
     ]
 )
 class InvitationEntity : BaseEntity() {
-    @Id
-    @Column(name = "id")
-    lateinit var id: UUID
-
-    @Column(name = "email", nullable = false)
+    @Column(name = "email", nullable = false, updatable = false, length = 254)
     lateinit var email: String
 
-    @Column(name = "role", nullable = false)
-    lateinit var role: String
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false, updatable = false)
+    lateinit var role: Role
 
-    @Column(name = "verification_code", nullable = false)
+    @Column(name = "verification_code", nullable = false, updatable = false, length = 6)
+    @Pattern(regexp = "^[0-9]{6}$", message = "Verification code must be exactly 6 digits")
     lateinit var verificationCode: String
 
-    @Column(name = "group_id")
-    var groupId: UUID? = null
+    @Column(name = "group_id", nullable = false, updatable = false)
+    lateinit var groupId: UUID
 
     @Column(name = "expires_at", nullable = false)
     lateinit var expiresAt: OffsetDateTime
