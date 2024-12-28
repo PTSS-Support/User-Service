@@ -8,7 +8,7 @@ import java.time.OffsetDateTime
 @Table(
     name = "group_family_members",
     uniqueConstraints = [
-        UniqueConstraint(columnNames = ["user"])
+        UniqueConstraint(columnNames = ["user_id"])
     ]
 )
 class GroupFamilyMemberEntity : BaseEntity() {

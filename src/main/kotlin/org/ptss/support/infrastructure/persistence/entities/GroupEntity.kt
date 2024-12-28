@@ -9,16 +9,16 @@ import org.hibernate.annotations.OnDeleteAction
 @Table(
     name = "groups",
     uniqueConstraints = [
-        UniqueConstraint(columnNames = ["patient"]),
-        UniqueConstraint(columnNames = ["primaryCaregiver"])
+        UniqueConstraint(columnNames = ["patient_id"]),
+        UniqueConstraint(columnNames = ["primary_caregiver_id"])
     ]
 )
 // Ensures patient, healthcare professional, and caregiver IDs are distinct in the database
 @Check(
     constraints = """
-        patient_id != healthcare_prof_id AND 
-        patient_id != caregiver_id AND 
-        healthcare_prof_id != caregiver_id
+        patient_id != healthcare_professional_id AND 
+        patient_id != primary_caregiver_id AND 
+        healthcare_professional_id != primary_caregiver_id
     """
 )
 class GroupEntity : BaseEntity() {
