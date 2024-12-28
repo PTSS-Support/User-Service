@@ -47,6 +47,15 @@ class InvitationEntity : BaseEntity() {
 
     @PrePersist
     fun prePersist() {
+        // Explicit check that role is initialized
+        if (!::role.isInitialized) {
+            throw IllegalStateException("Role must be set before persisting invitation")
+        }
+
+        require(role.canBeInvited()) {
+            "Only patients and family members can be invited"
+        }
+
         if (!::verificationCode.isInitialized) {
             verificationCode = generateVerificationCode()
         }
