@@ -10,7 +10,7 @@ import org.ptss.support.domain.constants.ValidationConstraints.VERIFICATION_CODE
 import org.ptss.support.domain.constants.ValidationMessages.EMPTY_PASSWORD
 import org.ptss.support.domain.constants.ValidationMessages.EMPTY_VERIFICATION_CODE
 import org.ptss.support.domain.constants.ValidationMessages.EMPTY_FIRST_NAME
-import org.ptss.support.domain.constants.ValidationMessages.EMPTY_LAST_NAME_
+import org.ptss.support.domain.constants.ValidationMessages.EMPTY_LAST_NAME
 import org.ptss.support.domain.constants.ValidationMessages.FIRST_NAME_LENGTH
 import org.ptss.support.domain.constants.ValidationMessages.LAST_NAME_LENGTH
 import org.ptss.support.domain.constants.ValidationMessages.FIRST_NAME_INVALID
@@ -30,7 +30,7 @@ data class UserRegistrationRequest(
     )
     val firstName: String,
 
-    @field:NotBlank(message = EMPTY_LAST_NAME_)
+    @field:NotBlank(message = EMPTY_LAST_NAME)
     @field:Size(
         max = NAME_MAX_LENGTH,
         message = LAST_NAME_LENGTH

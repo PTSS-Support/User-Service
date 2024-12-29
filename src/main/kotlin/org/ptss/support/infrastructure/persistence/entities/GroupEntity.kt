@@ -23,7 +23,7 @@ import org.hibernate.annotations.OnDeleteAction
 )
 class GroupEntity : BaseEntity() {
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false, updatable = false)
+    @JoinColumn(updatable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)  // When patient is deleted, delete the group
     var patient: UserEntity? = null
 

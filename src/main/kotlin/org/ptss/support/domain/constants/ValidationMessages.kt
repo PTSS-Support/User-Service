@@ -20,7 +20,7 @@ object ValidationMessages {
 
     // Name validation messages
     const val EMPTY_FIRST_NAME = "Voornaam $EMPTY_NAME"
-    const val EMPTY_LAST_NAME_ = "Achternaam $EMPTY_NAME"
+    const val EMPTY_LAST_NAME = "Achternaam $EMPTY_NAME"
     const val FIRST_NAME_LENGTH = "Voornaam $NAME_LENGTH"
     const val LAST_NAME_LENGTH = "Achternaam $NAME_LENGTH"
     const val FIRST_NAME_INVALID = "Voornaam $INVALID_NAME"
