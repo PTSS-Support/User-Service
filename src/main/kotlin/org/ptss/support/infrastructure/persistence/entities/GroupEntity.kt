@@ -25,7 +25,7 @@ class GroupEntity : BaseEntity() {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, updatable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)  // When patient is deleted, delete the group
-    lateinit var patient: UserEntity
+    var patient: UserEntity? = null
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
@@ -44,6 +44,17 @@ class GroupEntity : BaseEntity() {
         orphanRemoval = true
     )
     val familyMembers: Set<GroupFamilyMemberEntity> = HashSet()
+
+    val isActive: Boolean
+        get() = patient != null
+
+    @PreUpdate
+    @PrePersist
+    fun validateBusinessRules() {
+        if (!isActive && familyMembers.isNotEmpty()) {
+            throw IllegalStateException("Cannot have family members in inactive group")
+        }
+    }
 
     // Method to promote family member to primary caregiver
     fun promoteToPrimaryCaregiver(familyMember: GroupFamilyMemberEntity) {
