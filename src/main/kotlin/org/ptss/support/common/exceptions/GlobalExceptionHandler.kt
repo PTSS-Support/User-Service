@@ -150,15 +150,6 @@ class GlobalExceptionHandler @Inject constructor(
                 )
             }
 
-            is com.azure.data.tables.models.TableServiceException -> {
-                Log.error("Azure Table Storage error for request $requestId: ${exception.message}")
-                createResponse(
-                    errorCode = ErrorCode.SERVICE_UNAVAILABLE,
-                    message = "Storage service error",
-                    requestId = requestId
-                )
-            }
-
             is UnauthorizedException -> {
                 Log.warn("Unauthorized access attempt for request $requestId at path $path")
                 createResponse(

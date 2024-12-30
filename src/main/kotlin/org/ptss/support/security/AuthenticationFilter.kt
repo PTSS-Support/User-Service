@@ -11,6 +11,7 @@ import jakarta.ws.rs.core.Context
 import jakarta.ws.rs.core.HttpHeaders
 import jakarta.ws.rs.core.NewCookie
 import jakarta.ws.rs.ext.Provider
+import org.ptss.support.domain.config.SecurityProperties
 
 
 @Provider
