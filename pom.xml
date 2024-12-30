@@ -123,6 +123,18 @@
             <version>5.8.1</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>1.19.7</version> <!-- Maintain same version for both testcontainers -->
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <version>1.19.7</version> <!-- Maintain same version for both testcontainers -->
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
