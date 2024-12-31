@@ -10,7 +10,6 @@ import org.eclipse.microprofile.openapi.annotations.parameters.Parameter
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
 import org.ptss.support.api.dtos.requests.groups.CreateGroupRequest
-import org.ptss.support.api.dtos.requests.users.*
 import org.ptss.support.api.dtos.responses.groups.GroupResponse
 import org.ptss.support.api.dtos.responses.users.UserResponse
 import java.util.*

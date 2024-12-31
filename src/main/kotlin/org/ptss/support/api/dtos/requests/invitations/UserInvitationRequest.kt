@@ -1,4 +1,4 @@
-package org.ptss.support.api.dtos.requests.users
+package org.ptss.support.api.dtos.requests.invitations
 
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
