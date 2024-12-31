@@ -1,5 +1,6 @@
 package org.ptss.support.domain.models
 
+import org.ptss.support.domain.enums.Role
 import java.util.UUID
 import java.time.OffsetDateTime
 
@@ -9,5 +10,6 @@ data class User(
     val firstName: String,
     val lastName: String,
     val lastSeen: OffsetDateTime?,
-    val groupId: UUID?
+    val groupId: UUID?,
+    val role: Role
 )
