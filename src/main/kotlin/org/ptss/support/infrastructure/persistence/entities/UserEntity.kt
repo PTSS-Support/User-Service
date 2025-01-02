@@ -4,6 +4,7 @@ import java.util.UUID
 import java.time.OffsetDateTime
 import jakarta.persistence.*
 import org.ptss.support.domain.constants.ValidationConstraints.NAME_MAX_LENGTH
+import org.ptss.support.domain.enums.Role
 
 @Entity
 @Table(name = "users")
@@ -19,6 +20,11 @@ class UserEntity : BaseEntity() {
 
     @Column(nullable = false)
     var lastSeen: OffsetDateTime = OffsetDateTime.now()
+
+    // For now, we will save this here, but this will be fetched from Keycloak in the future.
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, updatable = false)
+    lateinit var role: Role
 
     // Navigate from User to their family memberships
     @OneToMany(mappedBy = "user")

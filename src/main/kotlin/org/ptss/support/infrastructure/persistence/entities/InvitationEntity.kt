@@ -7,6 +7,7 @@ import jakarta.persistence.*
 import org.ptss.support.domain.config.InvitationProperties
 import org.ptss.support.domain.constants.ValidationConstraints.EMAIL_MAX_LENGTH
 import org.ptss.support.domain.constants.ValidationConstraints.VERIFICATION_CODE_LENGTH
+import org.ptss.support.domain.constants.ValidationMessages.UNINVITABLE_ROLE
 import org.ptss.support.domain.enums.Role
 
 @Entity
@@ -53,7 +54,7 @@ class InvitationEntity : BaseEntity() {
         }
 
         require(role.canBeInvited()) {
-            "Only patients and family members can be invited"
+            UNINVITABLE_ROLE
         }
 
         if (!::verificationCode.isInitialized) {
