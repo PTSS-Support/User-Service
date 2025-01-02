@@ -23,7 +23,7 @@ interface IInvitationController {
     @APIResponses(
         APIResponse(
             responseCode = "201",
-            description = "Invitation sent successfully"
+            description = "Invitation created & sent successfully"
         ),
         APIResponse(
             responseCode = "400",
