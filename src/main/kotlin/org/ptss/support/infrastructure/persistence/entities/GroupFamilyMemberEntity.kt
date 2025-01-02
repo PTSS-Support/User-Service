@@ -2,7 +2,6 @@ package org.ptss.support.infrastructure.persistence.entities
 
 import io.quarkus.hibernate.orm.panache.kotlin.PanacheCompanion
 import jakarta.persistence.*
-import org.ptss.support.domain.constants.AnonymizationConstants
 import org.ptss.support.domain.constants.AnonymizationConstants.REMOVED_VALUE
 import java.time.OffsetDateTime
 
