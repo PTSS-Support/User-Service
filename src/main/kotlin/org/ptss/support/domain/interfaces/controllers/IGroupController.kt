@@ -11,6 +11,7 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
 import org.ptss.support.api.dtos.requests.groups.CreateGroupRequest
 import org.ptss.support.api.dtos.responses.groups.GroupResponse
+import org.ptss.support.api.dtos.responses.invitations.InvitationResponse
 import org.ptss.support.api.dtos.responses.users.UserResponse
 import java.util.*
 
@@ -86,4 +87,23 @@ interface IGroupController {
         @Parameter(description = "ID of the group", required = true)
         @PathParam("id") id: UUID
     ): List<UserResponse>
+
+    @GET
+    @Path("/{id}/invitations/pending")
+    @Operation(summary = "Get all pending invitations of a group", description = "Retrieves all pending invitations of a specific group")
+    @APIResponses(
+        APIResponse(
+            responseCode = "200",
+            description = "List of pending group invitations successfully retrieved",
+            content = [Content(schema = Schema(implementation = Array<InvitationResponse>::class))]
+        ),
+        APIResponse(
+            responseCode = "403",
+            description = "Forbidden"
+        )
+    )
+    suspend fun getPendingGroupInvitations(
+        @Parameter(description = "ID of the group", required = true)
+        @PathParam("id") id: UUID
+    ): List<InvitationResponse>
 }
