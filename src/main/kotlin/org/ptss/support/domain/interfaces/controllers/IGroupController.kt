@@ -14,6 +14,8 @@ import org.ptss.support.api.dtos.responses.groups.GroupResponse
 import org.ptss.support.api.dtos.responses.invitations.InvitationResponse
 import org.ptss.support.api.dtos.responses.users.UserResponse
 import org.ptss.support.common.pagination.CursorPage
+import org.ptss.support.domain.enums.Role
+import org.ptss.support.security.Authentication
 import java.util.*
 
 @Path("/groups")
@@ -22,6 +24,7 @@ import java.util.*
 interface IGroupController {
     @GET
     @Operation(summary = "Get all groups", description = "Retrieves a list of all groups")
+    @Authentication(roles = [Role.ADMIN, Role.HCP])
     @APIResponses(
         APIResponse(
             responseCode = "200",
@@ -40,6 +43,7 @@ interface IGroupController {
 
     @POST
     @Operation(summary = "Create new group", description = "Creates a new group")
+    @Authentication(roles = [Role.ADMIN, Role.HCP])
     @APIResponses(
         APIResponse(
             responseCode = "201",
@@ -60,6 +64,7 @@ interface IGroupController {
     @GET
     @Path("/members")
     @Operation(summary = "Get all members of your group", description = "Retrieves all members of the current user's group")
+    @Authentication(roles = [Role.ADMIN, Role.HCP, Role.PATIENT, Role.PRIMARY_CAREGIVER, Role.FAMILY_MEMBER])
     @APIResponses(
         APIResponse(
             responseCode = "200",
@@ -76,6 +81,7 @@ interface IGroupController {
     @GET
     @Path("/{id}/users")
     @Operation(summary = "Get all users of a group", description = "Retrieves all users of a specific group")
+    @Authentication(roles = [Role.ADMIN])
     @APIResponses(
         APIResponse(
             responseCode = "200",
@@ -95,6 +101,7 @@ interface IGroupController {
     @GET
     @Path("/{id}/invitations/pending")
     @Operation(summary = "Get all pending invitations of a group", description = "Retrieves all pending invitations of a specific group")
+    @Authentication(roles = [Role.ADMIN, Role.HCP, Role.PATIENT, Role.PRIMARY_CAREGIVER, Role.FAMILY_MEMBER])
     @APIResponses(
         APIResponse(
             responseCode = "200",

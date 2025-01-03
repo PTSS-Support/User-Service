@@ -11,6 +11,8 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
 import org.ptss.support.api.dtos.responses.users.UserResponse
 import org.ptss.support.common.pagination.CursorPage
+import org.ptss.support.domain.enums.Role
+import org.ptss.support.security.Authentication
 import java.util.*
 
 @Path("/users")
@@ -19,6 +21,7 @@ import java.util.*
 interface IUserController {
     @GET
     @Operation(summary = "Get all users")
+    @Authentication(roles = [Role.ADMIN])
     @APIResponses(
         APIResponse(
             responseCode = "200",
@@ -38,6 +41,7 @@ interface IUserController {
     @GET
     @Path("/me")
     @Operation(summary = "Get current user profile")
+    @Authentication(roles = [Role.ADMIN, Role.HCP, Role.PATIENT, Role.PRIMARY_CAREGIVER, Role.FAMILY_MEMBER])
     @APIResponses(
         APIResponse(
             responseCode = "200",
@@ -54,6 +58,7 @@ interface IUserController {
     @GET
     @Path("/{id}")
     @Operation(summary = "Get user by ID")
+    @Authentication(roles = [Role.ADMIN, Role.HCP])
     @APIResponses(
         APIResponse(
             responseCode = "200",
@@ -77,6 +82,7 @@ interface IUserController {
     @DELETE
     @Path("/{id}")
     @Operation(summary = "Delete user")
+    @Authentication(roles = [Role.ADMIN, Role.HCP, Role.PATIENT, Role.PRIMARY_CAREGIVER])
     @APIResponses(
         APIResponse(
             responseCode = "204",

@@ -12,6 +12,8 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import org.ptss.support.api.dtos.requests.invitations.CreateInvitationRequest
 import org.ptss.support.api.dtos.requests.invitations.UserInvitationVerificationRequest
 import org.ptss.support.api.dtos.requests.invitations.UserRegistrationRequest
+import org.ptss.support.domain.enums.Role
+import org.ptss.support.security.Authentication
 
 @Path("/users")
 @Produces(MediaType.APPLICATION_JSON)
@@ -20,6 +22,7 @@ interface IInvitationController {
     @POST
     @Path("/invite")
     @Operation(summary = "Invite user to join group")
+    @Authentication(roles = [Role.PATIENT, Role.PRIMARY_CAREGIVER])
     @APIResponses(
         APIResponse(
             responseCode = "201",
