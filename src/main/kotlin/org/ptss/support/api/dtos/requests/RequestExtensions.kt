@@ -8,7 +8,7 @@
 package org.ptss.support.api.dtos.requests
 
 import org.ptss.support.api.dtos.requests.groups.CreateGroupRequest
-import org.ptss.support.api.dtos.requests.invitations.UserInvitationRequest
+import org.ptss.support.api.dtos.requests.invitations.CreateInvitationRequest
 import org.ptss.support.api.dtos.requests.invitations.UserInvitationVerificationRequest
 import org.ptss.support.api.dtos.requests.invitations.UserRegistrationRequest
 import org.ptss.support.domain.commands.groups.CreateGroupCommand
@@ -28,7 +28,7 @@ fun CreateGroupRequest.toCreateInvitationCommand(groupId: UUID) = CreateInvitati
     groupId = groupId
 )
 
-fun UserInvitationRequest.toCommand(groupId: UUID) = CreateInvitationCommand(
+fun CreateInvitationRequest.toCommand(groupId: UUID) = CreateInvitationCommand(
     email = this.email,
     groupId = groupId,
     role = Role.FAMILY_MEMBER // Default role for regular invitations

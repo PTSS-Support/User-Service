@@ -9,7 +9,7 @@ import jakarta.ws.rs.core.Response
 import org.eclipse.microprofile.openapi.annotations.Operation
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
-import org.ptss.support.api.dtos.requests.invitations.UserInvitationRequest
+import org.ptss.support.api.dtos.requests.invitations.CreateInvitationRequest
 import org.ptss.support.api.dtos.requests.invitations.UserInvitationVerificationRequest
 import org.ptss.support.api.dtos.requests.invitations.UserRegistrationRequest
 
@@ -34,7 +34,7 @@ interface IInvitationController {
             description = "Forbidden"
         )
     )
-    suspend fun inviteUser(request: UserInvitationRequest): Response
+    suspend fun inviteUser(request: CreateInvitationRequest): Response
 
     @POST
     @Path("/invite/verify")
