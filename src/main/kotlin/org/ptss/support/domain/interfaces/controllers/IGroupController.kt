@@ -13,6 +13,7 @@ import org.ptss.support.api.dtos.requests.groups.CreateGroupRequest
 import org.ptss.support.api.dtos.responses.groups.GroupResponse
 import org.ptss.support.api.dtos.responses.invitations.InvitationResponse
 import org.ptss.support.api.dtos.responses.users.UserResponse
+import org.ptss.support.common.pagination.CursorPage
 import java.util.*
 
 @Path("/groups")
@@ -24,15 +25,18 @@ interface IGroupController {
     @APIResponses(
         APIResponse(
             responseCode = "200",
-            description = "List of groups successfully retrieved",
-            content = [Content(schema = Schema(implementation = Array<GroupResponse>::class))]
+            description = "List of groups with pagination metadata",
+            content = [Content(schema = Schema(implementation = CursorPage::class))]
         ),
         APIResponse(
             responseCode = "403",
             description = "Forbidden"
         )
     )
-    suspend fun getAllGroups(): List<GroupResponse>
+    suspend fun getAllGroups(
+        @QueryParam("limit") limit: Int?,
+        @QueryParam("cursor") cursor: UUID?
+    ): CursorPage<GroupResponse>
 
     @POST
     @Operation(summary = "Create new group", description = "Creates a new group")
