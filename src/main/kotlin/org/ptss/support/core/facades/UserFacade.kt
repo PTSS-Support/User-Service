@@ -2,11 +2,14 @@ package org.ptss.support.core.facades
 
 import jakarta.enterprise.context.ApplicationScoped
 import org.ptss.support.api.dtos.responses.users.UserResponse
+import org.ptss.support.api.dtos.responses.toResponse
 import org.ptss.support.common.pagination.CursorPage
+import org.ptss.support.common.pagination.mapItems
 import org.ptss.support.domain.commands.users.DeleteUserCommand
 import org.ptss.support.domain.interfaces.commands.ICommandHandler
 import org.ptss.support.domain.interfaces.facades.IUserFacade
 import org.ptss.support.domain.interfaces.queries.IQueryHandler
+import org.ptss.support.domain.models.User
 import org.ptss.support.domain.queries.users.GetAllUsersQuery
 import org.ptss.support.domain.queries.users.GetCurrentUserQuery
 import org.ptss.support.domain.queries.users.GetUserByIdQuery
@@ -14,18 +17,16 @@ import java.util.UUID
 
 @ApplicationScoped
 class UserFacade(
-    private val getAllUsersQueryHandler: IQueryHandler<GetAllUsersQuery, CursorPage<UserResponse>>,
-    private val getCurrentUserQueryHandler: IQueryHandler<GetCurrentUserQuery, UserResponse>,
-    private val getUserByIdQueryHandler: IQueryHandler<GetUserByIdQuery, UserResponse>,
+    private val getAllUsersQueryHandler: IQueryHandler<GetAllUsersQuery, CursorPage<User>>,
+    private val getCurrentUserQueryHandler: IQueryHandler<GetCurrentUserQuery, User>,
+    private val getUserByIdQueryHandler: IQueryHandler<GetUserByIdQuery, User>,
     private val deleteUserCommandHandler: ICommandHandler<DeleteUserCommand, Unit>
 ) : IUserFacade {
 
     override suspend fun getAllUsers(limit: Int?, cursor: UUID?): CursorPage<UserResponse> {
-        val query = GetAllUsersQuery(
-            limit = limit,
-            cursor = cursor
-        )
+        val query = GetAllUsersQuery(limit, cursor)
         return getAllUsersQueryHandler.handleAsync(query)
+            .mapItems { it.toResponse() }
     }
 
     override suspend fun getCurrentUser(): UserResponse {
@@ -33,11 +34,13 @@ class UserFacade(
         val userId = UUID.randomUUID()
         val query = GetCurrentUserQuery(userId = userId)
         return getCurrentUserQueryHandler.handleAsync(query)
+            .toResponse()
     }
 
     override suspend fun getUserById(userId: UUID): UserResponse {
         val query = GetUserByIdQuery(userId = userId)
         return getUserByIdQueryHandler.handleAsync(query)
+            .toResponse()
     }
 
     override suspend fun deleteUser(userId: UUID) {
