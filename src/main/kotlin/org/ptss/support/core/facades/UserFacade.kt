@@ -6,10 +6,11 @@ import org.ptss.support.api.dtos.responses.toResponse
 import org.ptss.support.common.pagination.CursorPage
 import org.ptss.support.common.pagination.mapItems
 import org.ptss.support.domain.commands.users.DeleteUserCommand
-import org.ptss.support.domain.interfaces.commands.ICommandHandler
+import org.ptss.support.domain.interfaces.commands.users.IDeleteUserCommandHandler
 import org.ptss.support.domain.interfaces.facades.IUserFacade
-import org.ptss.support.domain.interfaces.queries.IQueryHandler
-import org.ptss.support.domain.models.User
+import org.ptss.support.domain.interfaces.queries.users.IGetAllUsersQueryHandler
+import org.ptss.support.domain.interfaces.queries.users.IGetCurrentUserQueryHandler
+import org.ptss.support.domain.interfaces.queries.users.IGetUserByIdQueryHandler
 import org.ptss.support.domain.queries.users.GetAllUsersQuery
 import org.ptss.support.domain.queries.users.GetCurrentUserQuery
 import org.ptss.support.domain.queries.users.GetUserByIdQuery
@@ -17,10 +18,10 @@ import java.util.UUID
 
 @ApplicationScoped
 class UserFacade(
-    private val getAllUsersQueryHandler: IQueryHandler<GetAllUsersQuery, CursorPage<User>>,
-    private val getCurrentUserQueryHandler: IQueryHandler<GetCurrentUserQuery, User>,
-    private val getUserByIdQueryHandler: IQueryHandler<GetUserByIdQuery, User>,
-    private val deleteUserCommandHandler: ICommandHandler<DeleteUserCommand, Unit>
+    private val getAllUsersQueryHandler: IGetAllUsersQueryHandler,
+    private val getCurrentUserQueryHandler: IGetCurrentUserQueryHandler,
+    private val getUserByIdQueryHandler: IGetUserByIdQueryHandler,
+    private val deleteUserCommandHandler: IDeleteUserCommandHandler
 ) : IUserFacade {
 
     override suspend fun getAllUsers(limit: Int?, cursor: UUID?): CursorPage<UserResponse> {

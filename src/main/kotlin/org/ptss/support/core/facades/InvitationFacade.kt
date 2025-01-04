@@ -6,21 +6,20 @@ import org.ptss.support.api.dtos.requests.invitations.UserInvitationVerification
 import org.ptss.support.api.dtos.requests.invitations.UserRegistrationRequest
 import org.ptss.support.api.dtos.requests.toCommand
 import org.ptss.support.domain.commands.groups.AssignPatientToGroupCommand
-import org.ptss.support.domain.commands.invitations.CreateInvitationCommand
-import org.ptss.support.domain.commands.invitations.RegisterUserCommand
-import org.ptss.support.domain.commands.invitations.VerifyInvitationCommand
 import org.ptss.support.domain.enums.Role
-import org.ptss.support.domain.interfaces.commands.ICommandHandler
+import org.ptss.support.domain.interfaces.commands.groups.IAssignPatientToGroupCommandHandler
+import org.ptss.support.domain.interfaces.commands.invitations.ICreateInvitationCommandHandler
+import org.ptss.support.domain.interfaces.commands.invitations.IRegisterUserCommandHandler
+import org.ptss.support.domain.interfaces.commands.invitations.IVerifyInvitationCommandHandler
 import org.ptss.support.domain.interfaces.facades.IInvitationFacade
-import org.ptss.support.domain.models.User
 import java.util.UUID
 
 @ApplicationScoped
 class InvitationFacade(
-    private val createInvitationCommandHandler: ICommandHandler<CreateInvitationCommand, Unit>,
-    private val verifyInvitationCommandHandler: ICommandHandler<VerifyInvitationCommand, Unit>,
-    private val registerUserCommandHandler: ICommandHandler<RegisterUserCommand, User>,
-    private val assignPatientToGroupCommandHandler: ICommandHandler<AssignPatientToGroupCommand, Unit>
+    private val createInvitationCommandHandler: ICreateInvitationCommandHandler,
+    private val verifyInvitationCommandHandler: IVerifyInvitationCommandHandler,
+    private val registerUserCommandHandler: IRegisterUserCommandHandler,
+    private val assignPatientToGroupCommandHandler: IAssignPatientToGroupCommandHandler
 ) : IInvitationFacade {
 
     override suspend fun inviteUser(request: CreateInvitationRequest) {

@@ -1,0 +1,7 @@
+package org.ptss.support.domain.interfaces.queries.users
+
+import org.ptss.support.domain.interfaces.queries.IQueryHandler
+import org.ptss.support.domain.models.User
+import org.ptss.support.domain.queries.users.GetUserByIdQuery
+
+interface IGetUserByIdQueryHandler : IQueryHandler<GetUserByIdQuery, User>

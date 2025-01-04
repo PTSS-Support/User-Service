@@ -12,14 +12,13 @@ import org.ptss.support.api.dtos.responses.toResponse
 import org.ptss.support.api.dtos.responses.toUserResponse
 import org.ptss.support.common.pagination.CursorPage
 import org.ptss.support.common.pagination.mapItems
-import org.ptss.support.domain.commands.groups.CreateGroupCommand
-import org.ptss.support.domain.commands.invitations.CreateInvitationCommand
 import org.ptss.support.domain.interfaces.facades.IGroupFacade
-import org.ptss.support.domain.interfaces.commands.ICommandHandler
-import org.ptss.support.domain.interfaces.queries.IQueryHandler
-import org.ptss.support.domain.models.Group
-import org.ptss.support.domain.models.Invitation
-import org.ptss.support.domain.models.User
+import org.ptss.support.domain.interfaces.commands.groups.ICreateGroupCommandHandler
+import org.ptss.support.domain.interfaces.commands.invitations.ICreateInvitationCommandHandler
+import org.ptss.support.domain.interfaces.queries.groups.IGetAllGroupsQueryHandler
+import org.ptss.support.domain.interfaces.queries.groups.IGetGroupMembersQueryHandler
+import org.ptss.support.domain.interfaces.queries.groups.IGetGroupUsersQueryHandler
+import org.ptss.support.domain.interfaces.queries.invitations.IGetPendingInvitationsByGroupQueryHandler
 import org.ptss.support.domain.queries.groups.GetAllGroupsQuery
 import org.ptss.support.domain.queries.groups.GetGroupMembersQuery
 import org.ptss.support.domain.queries.groups.GetGroupUsersQuery
@@ -28,12 +27,12 @@ import java.util.UUID
 
 @ApplicationScoped
 class GroupFacade(
-    private val createGroupCommandHandler: ICommandHandler<CreateGroupCommand, Group>,
-    private val createInvitationCommandHandler: ICommandHandler<CreateInvitationCommand, Unit>,
-    private val getAllGroupsQueryHandler: IQueryHandler<GetAllGroupsQuery, CursorPage<Group>>,
-    private val getGroupMembersQueryHandler: IQueryHandler<GetGroupMembersQuery, List<User>>,
-    private val getGroupUsersQueryHandler: IQueryHandler<GetGroupUsersQuery, List<User>>,
-    private val getPendingGroupInvitationsQueryHandler: IQueryHandler<GetPendingInvitationsByGroupQuery, List<Invitation>>
+    private val createGroupCommandHandler: ICreateGroupCommandHandler,
+    private val createInvitationCommandHandler: ICreateInvitationCommandHandler,
+    private val getAllGroupsQueryHandler: IGetAllGroupsQueryHandler,
+    private val getGroupMembersQueryHandler: IGetGroupMembersQueryHandler,
+    private val getGroupUsersQueryHandler: IGetGroupUsersQueryHandler,
+    private val getPendingGroupInvitationsByGroupQueryHandler: IGetPendingInvitationsByGroupQueryHandler
 ) : IGroupFacade {
 
     override suspend fun getAllGroups(limit: Int?, cursor: UUID?): CursorPage<GroupResponse> {
@@ -76,7 +75,7 @@ class GroupFacade(
             // This would typically be injected via a security context or similar
             groupId = UUID.randomUUID() // TODO: Replace with actual group ID from context
         )
-        return getPendingGroupInvitationsQueryHandler.handleAsync(query)
+        return getPendingGroupInvitationsByGroupQueryHandler.handleAsync(query)
             .toInvitationResponse()
     }
 }
