@@ -1,5 +1,7 @@
 package org.ptss.support.domain.queries.users
 
+import java.util.UUID
+
 data class GetCurrentUserQuery(
-    val keycloakId: String
+    val userId: UUID
 )

@@ -16,7 +16,7 @@ import org.ptss.support.api.dtos.responses.users.UserResponse
 import org.ptss.support.common.pagination.CursorPage
 import org.ptss.support.domain.enums.Role
 import org.ptss.support.security.Authentication
-import java.util.*
+import java.util.UUID
 
 @Path("/groups")
 @Produces(MediaType.APPLICATION_JSON)
@@ -99,8 +99,8 @@ interface IGroupController {
     ): List<UserResponse>
 
     @GET
-    @Path("/{id}/invitations/pending")
-    @Operation(summary = "Get all pending invitations of a group", description = "Retrieves all pending invitations of a specific group")
+    @Path("/invitations/pending")
+    @Operation(summary = "Get all pending invitations of your group", description = "Retrieves all pending invitations of your specific group")
     @Authentication(roles = [Role.ADMIN, Role.HCP, Role.PATIENT, Role.PRIMARY_CAREGIVER, Role.FAMILY_MEMBER])
     @APIResponses(
         APIResponse(
@@ -113,8 +113,5 @@ interface IGroupController {
             description = "Forbidden"
         )
     )
-    suspend fun getPendingGroupInvitations(
-        @Parameter(description = "ID of the group", required = true)
-        @PathParam("id") id: UUID
-    ): List<InvitationResponse>
+    suspend fun getPendingGroupInvitations(): List<InvitationResponse>
 }

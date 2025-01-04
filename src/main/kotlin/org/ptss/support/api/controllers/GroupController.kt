@@ -32,7 +32,7 @@ class GroupController @Inject constructor(
         return groupFacade.getGroupUsers(id)
     }
 
-    override suspend fun getPendingGroupInvitations(id: UUID): List<InvitationResponse> {
-        return groupFacade.getPendingGroupInvitations(id)
+    override suspend fun getPendingGroupInvitations(): List<InvitationResponse> {
+        return groupFacade.getPendingGroupInvitations()
     }
 }

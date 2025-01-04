@@ -13,7 +13,7 @@ import org.ptss.support.api.dtos.responses.users.UserResponse
 import org.ptss.support.common.pagination.CursorPage
 import org.ptss.support.domain.enums.Role
 import org.ptss.support.security.Authentication
-import java.util.*
+import java.util.UUID
 
 @Path("/users")
 @Produces(MediaType.APPLICATION_JSON)

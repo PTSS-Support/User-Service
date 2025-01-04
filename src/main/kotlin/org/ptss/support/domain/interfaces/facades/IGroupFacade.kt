@@ -16,5 +16,5 @@ interface IGroupFacade {
 
     suspend fun getGroupUsers(groupId: UUID): List<UserResponse>
 
-    suspend fun getPendingGroupInvitations(groupId: UUID): List<InvitationResponse>
+    suspend fun getPendingGroupInvitations(): List<InvitationResponse>
 }
