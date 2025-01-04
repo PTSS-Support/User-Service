@@ -6,8 +6,10 @@ import org.ptss.support.api.dtos.requests.toCreateGroupCommand
 import org.ptss.support.api.dtos.requests.toCreateInvitationCommand
 import org.ptss.support.api.dtos.responses.groups.GroupResponse
 import org.ptss.support.api.dtos.responses.invitations.InvitationResponse
+import org.ptss.support.api.dtos.responses.toInvitationResponse
 import org.ptss.support.api.dtos.responses.users.UserResponse
 import org.ptss.support.api.dtos.responses.toResponse
+import org.ptss.support.api.dtos.responses.toUserResponse
 import org.ptss.support.common.pagination.CursorPage
 import org.ptss.support.common.pagination.mapItems
 import org.ptss.support.domain.commands.groups.CreateGroupCommand
@@ -59,13 +61,13 @@ class GroupFacade(
             groupId = UUID.randomUUID() // TODO: Replace with actual group ID from context
         )
         return getGroupMembersQueryHandler.handleAsync(query)
-            .toResponse()
+            .toUserResponse()
     }
 
     override suspend fun getGroupUsers(groupId: UUID): List<UserResponse> {
         val query = GetGroupUsersQuery(groupId = groupId)
         return getGroupUsersQueryHandler.handleAsync(query)
-            .toResponse()
+            .toUserResponse()
     }
 
     override suspend fun getPendingGroupInvitations(): List<InvitationResponse> {
@@ -75,6 +77,6 @@ class GroupFacade(
             groupId = UUID.randomUUID() // TODO: Replace with actual group ID from context
         )
         return getPendingGroupInvitationsQueryHandler.handleAsync(query)
-            .toResponse()
+            .toInvitationResponse()
     }
 }

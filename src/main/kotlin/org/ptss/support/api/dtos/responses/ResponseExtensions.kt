@@ -36,6 +36,6 @@ fun User.toResponse() = UserResponse(
 )
 
 // Collection mappings
-fun List<Group>.toResponse() = this.map { it.toResponse() }
-fun List<Invitation>.toResponse() = this.map { it.toResponse() }
-fun List<User>.toResponse() = this.map { it.toResponse() }
+fun List<Group>.toGroupResponse() = this.map { it.toResponse() }
+fun List<Invitation>.toInvitationResponse() = this.map { it.toResponse() }
+fun List<User>.toUserResponse() = this.map { it.toResponse() }
