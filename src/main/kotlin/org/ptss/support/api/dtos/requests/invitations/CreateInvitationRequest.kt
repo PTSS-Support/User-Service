@@ -8,7 +8,7 @@ import org.ptss.support.domain.constants.ValidationMessages.EMAIL_LENGTH
 import org.ptss.support.domain.constants.ValidationMessages.EMPTY_EMAIL
 import org.ptss.support.domain.constants.ValidationMessages.INVALID_EMAIL
 
-data class UserInvitationRequest(
+data class CreateInvitationRequest(
     @field:NotBlank(message = EMPTY_EMAIL)
     @field:Email(message = INVALID_EMAIL)
     @field:Size(

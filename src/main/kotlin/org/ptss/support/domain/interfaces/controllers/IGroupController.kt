@@ -13,7 +13,10 @@ import org.ptss.support.api.dtos.requests.groups.CreateGroupRequest
 import org.ptss.support.api.dtos.responses.groups.GroupResponse
 import org.ptss.support.api.dtos.responses.invitations.InvitationResponse
 import org.ptss.support.api.dtos.responses.users.UserResponse
-import java.util.*
+import org.ptss.support.common.pagination.CursorPage
+import org.ptss.support.domain.enums.Role
+import org.ptss.support.security.Authentication
+import java.util.UUID
 
 @Path("/groups")
 @Produces(MediaType.APPLICATION_JSON)
@@ -21,21 +24,26 @@ import java.util.*
 interface IGroupController {
     @GET
     @Operation(summary = "Get all groups", description = "Retrieves a list of all groups")
+    @Authentication(roles = [Role.ADMIN, Role.HCP])
     @APIResponses(
         APIResponse(
             responseCode = "200",
-            description = "List of groups successfully retrieved",
-            content = [Content(schema = Schema(implementation = Array<GroupResponse>::class))]
+            description = "List of groups with pagination metadata",
+            content = [Content(schema = Schema(implementation = CursorPage::class))]
         ),
         APIResponse(
             responseCode = "403",
             description = "Forbidden"
         )
     )
-    suspend fun getAllGroups(): List<GroupResponse>
+    suspend fun getAllGroups(
+        @QueryParam("limit") limit: Int?,
+        @QueryParam("cursor") cursor: UUID?
+    ): CursorPage<GroupResponse>
 
     @POST
     @Operation(summary = "Create new group", description = "Creates a new group")
+    @Authentication(roles = [Role.ADMIN, Role.HCP])
     @APIResponses(
         APIResponse(
             responseCode = "201",
@@ -56,6 +64,7 @@ interface IGroupController {
     @GET
     @Path("/members")
     @Operation(summary = "Get all members of your group", description = "Retrieves all members of the current user's group")
+    @Authentication(roles = [Role.ADMIN, Role.HCP, Role.PATIENT, Role.PRIMARY_CAREGIVER, Role.FAMILY_MEMBER])
     @APIResponses(
         APIResponse(
             responseCode = "200",
@@ -72,6 +81,7 @@ interface IGroupController {
     @GET
     @Path("/{id}/users")
     @Operation(summary = "Get all users of a group", description = "Retrieves all users of a specific group")
+    @Authentication(roles = [Role.ADMIN])
     @APIResponses(
         APIResponse(
             responseCode = "200",
@@ -89,8 +99,9 @@ interface IGroupController {
     ): List<UserResponse>
 
     @GET
-    @Path("/{id}/invitations/pending")
-    @Operation(summary = "Get all pending invitations of a group", description = "Retrieves all pending invitations of a specific group")
+    @Path("/invitations/pending")
+    @Operation(summary = "Get all pending invitations of your group", description = "Retrieves all pending invitations of your specific group")
+    @Authentication(roles = [Role.ADMIN, Role.HCP, Role.PATIENT, Role.PRIMARY_CAREGIVER, Role.FAMILY_MEMBER])
     @APIResponses(
         APIResponse(
             responseCode = "200",
@@ -102,8 +113,5 @@ interface IGroupController {
             description = "Forbidden"
         )
     )
-    suspend fun getPendingGroupInvitations(
-        @Parameter(description = "ID of the group", required = true)
-        @PathParam("id") id: UUID
-    ): List<InvitationResponse>
+    suspend fun getPendingGroupInvitations(): List<InvitationResponse>
 }

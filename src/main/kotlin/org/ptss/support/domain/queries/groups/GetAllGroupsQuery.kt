@@ -1,3 +1,8 @@
 package org.ptss.support.domain.queries.groups
 
-class GetAllGroupsQuery()
+import java.util.UUID
+
+data class GetAllGroupsQuery(
+    val limit: Int?,
+    val cursor: UUID?
+)

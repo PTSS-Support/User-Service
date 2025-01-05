@@ -13,7 +13,17 @@ data class CursorPage<T>(
         example = "a829f845-b6a6-4cc6-8c62-70e75ed5e5f4"
     )
     val nextCursor: UUID?
-)
+) {
+    fun <R> map(transform: (T) -> R): CursorPage<R> =
+        CursorPage(items.map(transform), nextCursor)
 
-// Extension functions to make pagination easier
+    companion object {
+        fun <T> empty() = CursorPage<T>(emptyList(), null)
+    }
+}
+
+// Extension functions
+inline fun <T, R> CursorPage<T>.mapItems(crossinline transform: (T) -> R): CursorPage<R> =
+    CursorPage(items.map { transform(it) }, nextCursor)
+
 fun <T> List<T>.toCursorPage(nextCursor: UUID? = null) = CursorPage(this, nextCursor)

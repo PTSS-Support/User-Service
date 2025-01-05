@@ -1,6 +1,7 @@
 package org.ptss.support.security
 
 import jakarta.ws.rs.NameBinding
+import org.ptss.support.domain.constants.ValidationMessages.UNAUTHORIZED_ACCESS
 import org.ptss.support.domain.enums.Role
 
 
@@ -9,5 +10,5 @@ import org.ptss.support.domain.enums.Role
 @Retention(AnnotationRetention.RUNTIME)
 annotation class Authentication(
     val roles: Array<Role>,
-    val message: String = "Unauthorized access"
+    val message: String = UNAUTHORIZED_ACCESS
 )
