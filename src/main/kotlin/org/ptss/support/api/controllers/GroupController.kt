@@ -16,9 +16,8 @@ class GroupController @Inject constructor(
     private val groupFacade: IGroupFacade
 ) : IGroupController {
 
-    override suspend fun getAllGroups(limit: Int?, cursor: UUID?): CursorPage<GroupResponse> {
-        return groupFacade.getAllGroups(limit, cursor)
-    }
+    override suspend fun getAllGroups(limit: Int?, cursor: UUID?): CursorPage<GroupResponse> =
+       groupFacade.getAllGroups(limit, cursor)
 
     override suspend fun createGroup(request: CreateGroupRequest): GroupResponse {
         return groupFacade.createGroup(request)
