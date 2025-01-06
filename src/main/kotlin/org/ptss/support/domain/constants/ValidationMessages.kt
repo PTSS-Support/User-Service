@@ -40,7 +40,4 @@ object ValidationMessages {
 
     // Invitable role validation messages
     const val UNINVITABLE_ROLE = "Only patients and family members can be invited"
-
-    // Invalid authentication messages
-    const val UNAUTHORIZED_ACCESS = "Unauthorized access" // Generic message so that you don't give too much away to the user
 }
