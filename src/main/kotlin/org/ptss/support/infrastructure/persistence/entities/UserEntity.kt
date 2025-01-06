@@ -98,7 +98,7 @@ class UserEntity : BaseEntity() {
 
     private fun validatePatientDeletion() {
         // Ensure patient has a group before deletion
-        val group = GroupEntity.find("patient", this).firstResult()
+        GroupEntity.find("patient", this).firstResult()
             ?: throw IllegalStateException("Patient must have a group")
     }
 

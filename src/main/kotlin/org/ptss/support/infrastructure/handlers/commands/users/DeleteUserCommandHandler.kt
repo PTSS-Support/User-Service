@@ -67,7 +67,7 @@ class DeleteUserCommandHandler(
 
     private fun deletePatient(patient: UserEntity) {
         Log.debug("Deleting patient ${patient.id}")
-        val group = GroupEntity.find("patient", patient).firstResult()
+        GroupEntity.find("patient", patient).firstResult()
             ?: run {
                 Log.error("Patient ${patient.id} has no associated group")
                 throw IllegalStateException("Patient without group")
