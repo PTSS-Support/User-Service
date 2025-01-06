@@ -8,16 +8,20 @@ import org.ptss.support.infrastructure.persistence.entities.GroupEntity
 import org.ptss.support.infrastructure.persistence.entities.UserEntity
 import jakarta.ws.rs.BadRequestException
 import jakarta.ws.rs.NotFoundException
-import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @ApplicationScoped
-class AssignPatientToGroupCommandHandler(
-    private val em: EntityManager
-) : IAssignPatientToGroupCommandHandler {
+class AssignPatientToGroupCommandHandler : IAssignPatientToGroupCommandHandler {
+
+    override suspend fun handleAsync(command: AssignPatientToGroupCommand) =
+        withContext(Dispatchers.IO) {
+            handleTransaction(command)
+        }
 
     @Transactional
-    override suspend fun handleAsync(command: AssignPatientToGroupCommand) {
+    fun handleTransaction(command: AssignPatientToGroupCommand) {
         Log.debug("Attempting to assign patient ${command.patientId} to group ${command.groupId}")
 
         val group = GroupEntity.findById(command.groupId)

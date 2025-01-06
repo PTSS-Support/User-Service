@@ -10,12 +10,19 @@ import org.ptss.support.infrastructure.persistence.entities.UserEntity
 import org.ptss.support.infrastructure.persistence.entities.toModel
 import jakarta.ws.rs.NotFoundException
 import jakarta.transaction.Transactional
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @ApplicationScoped
 class CreateGroupCommandHandler : ICreateGroupCommandHandler {
 
+    override suspend fun handleAsync(command: CreateGroupCommand) =
+        withContext(Dispatchers.IO) {
+            handleTransaction(command)
+        }
+
     @Transactional
-    override suspend fun handleAsync(command: CreateGroupCommand): Group {
+    fun handleTransaction(command: CreateGroupCommand): Group {
         Log.debug("Attempting to create group with HCP ID: ${command.healthcareProfessionalId}")
 
         val hcp = UserEntity.findById(command.healthcareProfessionalId)

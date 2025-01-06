@@ -6,6 +6,8 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.persistence.OptimisticLockException
 import jakarta.transaction.Transactional
 import jakarta.ws.rs.NotFoundException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.ptss.support.domain.commands.users.DeleteUserCommand
 import org.ptss.support.domain.enums.Role
 import org.ptss.support.domain.interfaces.commands.users.IDeleteUserCommandHandler
@@ -18,9 +20,15 @@ import org.ptss.support.security.context.AuthenticatedUserContext
 class DeleteUserCommandHandler(
     private val userContext: AuthenticatedUserContext
 ) : IDeleteUserCommandHandler {
+
+    override suspend fun handleAsync(command: DeleteUserCommand) =
+        withContext(Dispatchers.IO) {
+            handleTransaction(command)
+        }
+
     @Transactional
     @Throws(UnauthorizedException::class)
-    override suspend fun handleAsync(command: DeleteUserCommand) {
+    fun handleTransaction(command: DeleteUserCommand) {
         Log.info("Processing delete user request for userId: ${command.userId}")
         val user = userContext.getCurrentUser()
 

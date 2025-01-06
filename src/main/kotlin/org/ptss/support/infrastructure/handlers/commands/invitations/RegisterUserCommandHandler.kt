@@ -9,17 +9,21 @@ import org.ptss.support.infrastructure.persistence.entities.InvitationEntity
 import org.ptss.support.infrastructure.persistence.entities.UserEntity
 import org.ptss.support.infrastructure.persistence.entities.toModel
 import jakarta.ws.rs.BadRequestException
-import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.util.UUID
 
 @ApplicationScoped
-class RegisterUserCommandHandler(
-    private val em: EntityManager
-) : IRegisterUserCommandHandler {
+class RegisterUserCommandHandler : IRegisterUserCommandHandler {
+
+    override suspend fun handleAsync(command: RegisterUserCommand) =
+        withContext(Dispatchers.IO) {
+            handleTransaction(command)
+        }
 
     @Transactional
-    override suspend fun handleAsync(command: RegisterUserCommand): User {
+    fun handleTransaction(command: RegisterUserCommand): User {
         Log.debug("Attempting to register user with invitation code: ${command.invitationCode}")
 
         val invitation = InvitationEntity
