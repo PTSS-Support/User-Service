@@ -5,10 +5,12 @@ import com.fasterxml.jackson.databind.exc.ValueInstantiationException
 import io.quarkus.logging.Log
 import io.quarkus.security.UnauthorizedException
 import io.smallrye.faulttolerance.api.RateLimitException
+import jakarta.el.MethodNotFoundException
 import jakarta.inject.Inject
 import jakarta.persistence.OptimisticLockException
 import jakarta.validation.ConstraintViolationException
 import jakarta.ws.rs.ForbiddenException
+import jakarta.ws.rs.NotAllowedException
 import jakarta.ws.rs.NotFoundException
 import jakarta.ws.rs.Produces
 import jakarta.ws.rs.WebApplicationException
@@ -137,6 +139,15 @@ class GlobalExceptionHandler @Inject constructor(
                 )
             }
 
+            is NotAllowedException -> {
+                Log.warn("Method not allowed for request $requestId at path $path")
+                createResponse(
+                    errorCode = ErrorCode.METHOD_NOT_ALLOWED,
+                    message = "Method not allowed for this endpoint",
+                    requestId = requestId
+                )
+            }
+
             is WebApplicationException -> {
                 val message = when (val cause = exception.cause) {
                     is ValueInstantiationException -> getNullFieldFromError(cause)
@@ -144,8 +155,18 @@ class GlobalExceptionHandler @Inject constructor(
                 }
 
                 Log.error("Web application error for request $requestId: $message")
+
+                // Map the status code to an appropriate error code instead of always using VALIDATION_ERROR
+                val errorCode = when (exception.response.status) {
+                    405 -> ErrorCode.METHOD_NOT_ALLOWED
+                    400 -> ErrorCode.VALIDATION_ERROR
+                    401 -> ErrorCode.INVALID_TOKEN
+                    403 -> ErrorCode.INSUFFICIENT_PERMISSIONS
+                    404 -> ErrorCode.NOT_FOUND
+                    else -> ErrorCode.INTERNAL_ERROR
+                }
                 createResponse(
-                    errorCode = ErrorCode.VALIDATION_ERROR,
+                    errorCode = errorCode,
                     message = message,
                     requestId = requestId
                 )
