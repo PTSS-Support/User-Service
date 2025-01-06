@@ -1,5 +1,6 @@
 package org.ptss.support.infrastructure.handlers.commands.invitations
 
+import io.quarkus.logging.Log
 import jakarta.enterprise.context.ApplicationScoped
 import org.ptss.support.domain.commands.invitations.RegisterUserCommand
 import org.ptss.support.domain.interfaces.commands.invitations.IRegisterUserCommandHandler
@@ -19,11 +20,15 @@ class RegisterUserCommandHandler(
 
     @Transactional
     override suspend fun handleAsync(command: RegisterUserCommand): User {
+        Log.debug("Attempting to register user with invitation code: ${command.invitationCode}")
+
         val invitation = InvitationEntity
             .find("verificationCode = ?1 and isVerified = true and isRegistered = false",
                 command.invitationCode)
             .firstResult()
-            ?: throw BadRequestException("Invalid or already used invitation code")
+            ?: throw BadRequestException("Invalid or already used invitation code").also {
+                Log.error("Invalid or already used invitation code: ${command.invitationCode}")
+            }
 
         val user = UserEntity().apply {
             keycloakId = UUID.randomUUID() // TODO: This should be replaced with actual Keycloak integration
@@ -34,10 +39,10 @@ class RegisterUserCommandHandler(
 
         user.persistAndFlush()
 
-        // Mark invitation as registered
         invitation.isRegistered = true
         invitation.persistAndFlush()
 
+        Log.info("Successfully registered user: ${user.firstName} ${user.lastName} with role: ${user.role}")
         return user.toModel()
     }
 }

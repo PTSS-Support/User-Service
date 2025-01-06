@@ -7,37 +7,34 @@ import org.ptss.support.domain.interfaces.queries.users.IGetAllUsersQueryHandler
 import org.ptss.support.domain.models.User
 import org.ptss.support.infrastructure.persistence.entities.UserEntity
 import org.ptss.support.infrastructure.persistence.entities.toModel
-import io.quarkus.panache.common.Parameters
 import io.quarkus.panache.common.Sort
+import io.quarkus.logging.Log
 
 @ApplicationScoped
 class GetAllUsersQueryHandler : IGetAllUsersQueryHandler {
     override suspend fun handleAsync(query: GetAllUsersQuery): CursorPage<User> {
-        val limit = query.limit ?: DEFAULT_PAGE_SIZE
+        Log.debug("Fetching users page with limit: ${query.limit}, cursor: ${query.cursor}")
 
         val users = if (query.cursor != null) {
             UserEntity
                 .find("id > ?1", query.cursor)
-                .page(0, limit + 1)
+                .page(0, query.limit + 1)
                 .list()
         } else {
             UserEntity
                 .findAll(Sort.by("id"))
-                .page(0, limit + 1)
+                .page(0, query.limit + 1)
                 .list()
         }
 
-        val hasMore = users.size > limit
-        val items = users.take(limit).map { it.toModel() }
+        val hasMore = users.size > query.limit
+        val items = users.take(query.limit).map { it.toModel() }
         val nextCursor = if (hasMore && items.isNotEmpty()) items.last().id else null
 
+        Log.debug("Retrieved ${items.size} users, hasMore: $hasMore")
         return CursorPage(
             items = items,
             nextCursor = nextCursor
         )
-    }
-
-    companion object {
-        private const val DEFAULT_PAGE_SIZE = 20
     }
 }
