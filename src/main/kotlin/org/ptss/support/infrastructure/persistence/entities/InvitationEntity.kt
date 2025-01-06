@@ -1,6 +1,6 @@
 package org.ptss.support.infrastructure.persistence.entities
 
-import io.quarkus.hibernate.orm.panache.kotlin.PanacheCompanion
+import io.quarkus.hibernate.orm.panache.kotlin.PanacheCompanionBase
 import java.time.OffsetDateTime
 import java.util.UUID
 import jakarta.persistence.*
@@ -40,7 +40,7 @@ class InvitationEntity : BaseEntity() {
     @Column(nullable = false)
     var isRegistered: Boolean = false
 
-    companion object : PanacheCompanion<InvitationEntity> {
+    companion object : PanacheCompanionBase<InvitationEntity, UUID> {
         fun findByEmailAndVerificationCode(email: String, code: String): InvitationEntity? =
             find("email = ?1 and verificationCode = ?2 and isVerified = false and expiresAt > CURRENT_TIMESTAMP",
                 email, code).firstResult()

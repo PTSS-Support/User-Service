@@ -5,6 +5,7 @@ import java.time.OffsetDateTime
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
+import org.hibernate.annotations.UuidGenerator
 import java.util.UUID
 
 @MappedSuperclass
@@ -16,6 +17,8 @@ abstract class BaseEntity : PanacheEntityBase {
     var version: Long = 0
 
     @Id
+    @GeneratedValue
+    @UuidGenerator
     lateinit var id: UUID
 
     // Database-managed

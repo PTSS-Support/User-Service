@@ -1,9 +1,12 @@
 package org.ptss.support.infrastructure.persistence.entities
 
+import io.quarkus.hibernate.orm.panache.kotlin.PanacheCompanionBase
 import jakarta.persistence.*
 import org.hibernate.annotations.Check
 import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
+import java.util.*
+import kotlin.collections.HashSet
 
 @Entity
 @Table(
@@ -56,9 +59,35 @@ class GroupEntity : BaseEntity() {
         }
     }
 
+    @PreRemove
+    fun validateDeletion() {
+        // Only allow deletion of groups through patient deletion
+        // or if group is inactive (no patient)
+        if (patient != null && !isMarkedForDeletion(patient!!)) {
+            throw IllegalStateException("Cannot delete active group unless through patient deletion")
+        }
+    }
+
+    private fun isMarkedForDeletion(user: UserEntity): Boolean {
+        return try {
+            findById(user.id) == null
+        } catch (e: Exception) {
+            true
+        }
+    }
+
     // Method to promote family member to primary caregiver
     fun promoteToPrimaryCaregiver(familyMember: GroupFamilyMemberEntity) {
         require(familyMembers.contains(familyMember)) { "User must be a family member first" }
         primaryCaregiver = familyMember.user
     }
+
+    fun removeAsPrimaryCaregiver(user: UserEntity) {
+        if (primaryCaregiver?.id == user.id) {
+            primaryCaregiver = null
+            persist()
+        }
+    }
+
+    companion object : PanacheCompanionBase<GroupEntity, UUID>
 }

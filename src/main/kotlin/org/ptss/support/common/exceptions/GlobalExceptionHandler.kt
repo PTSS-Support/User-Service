@@ -6,6 +6,7 @@ import io.quarkus.logging.Log
 import io.quarkus.security.UnauthorizedException
 import io.smallrye.faulttolerance.api.RateLimitException
 import jakarta.inject.Inject
+import jakarta.persistence.OptimisticLockException
 import jakarta.validation.ConstraintViolationException
 import jakarta.ws.rs.ForbiddenException
 import jakarta.ws.rs.NotFoundException
@@ -155,6 +156,15 @@ class GlobalExceptionHandler @Inject constructor(
                 createResponse(
                     errorCode = ErrorCode.INVALID_TOKEN,
                     message = "Authentication failed",
+                    requestId = requestId
+                )
+            }
+
+            is OptimisticLockException -> {
+                Log.warn("Optimistic lock exception occurred for request $requestId at path $path: ${exception.message}")
+                createResponse(
+                    errorCode = ErrorCode.CONFLICT,
+                    message = "Resource was modified by another operation, please try again",
                     requestId = requestId
                 )
             }
