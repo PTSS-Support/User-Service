@@ -1,31 +1,35 @@
 package org.ptss.support.core.facades
 
+import io.quarkus.logging.Log
+import io.quarkus.security.UnauthorizedException
 import jakarta.enterprise.context.ApplicationScoped
 import org.ptss.support.api.dtos.requests.invitations.CreateInvitationRequest
 import org.ptss.support.api.dtos.requests.invitations.UserInvitationVerificationRequest
 import org.ptss.support.api.dtos.requests.invitations.UserRegistrationRequest
 import org.ptss.support.api.dtos.requests.toCommand
 import org.ptss.support.domain.commands.groups.AssignPatientToGroupCommand
+import org.ptss.support.domain.constants.SecurityMessages.UNAUTHORIZED_ACCESS
 import org.ptss.support.domain.enums.Role
 import org.ptss.support.domain.interfaces.commands.groups.IAssignPatientToGroupCommandHandler
 import org.ptss.support.domain.interfaces.commands.invitations.ICreateInvitationCommandHandler
 import org.ptss.support.domain.interfaces.commands.invitations.IRegisterUserCommandHandler
 import org.ptss.support.domain.interfaces.commands.invitations.IVerifyInvitationCommandHandler
 import org.ptss.support.domain.interfaces.facades.IInvitationFacade
-import java.util.UUID
+import org.ptss.support.security.context.AuthenticatedUserContext
 
 @ApplicationScoped
 class InvitationFacade(
     private val createInvitationCommandHandler: ICreateInvitationCommandHandler,
     private val verifyInvitationCommandHandler: IVerifyInvitationCommandHandler,
     private val registerUserCommandHandler: IRegisterUserCommandHandler,
-    private val assignPatientToGroupCommandHandler: IAssignPatientToGroupCommandHandler
+    private val assignPatientToGroupCommandHandler: IAssignPatientToGroupCommandHandler,
+    private val userContext: AuthenticatedUserContext
 ) : IInvitationFacade {
 
     override suspend fun inviteUser(request: CreateInvitationRequest) {
-        // TODO: Replace with actual group ID from context
-        val groupId = UUID.randomUUID()
-        val command = request.toCommand(groupId)
+        val user = userContext.getCurrentUser()
+        Log.info("Authenticated user $user with groupId ${user.groupId?: "ILLEGAL STATE"}")
+        val command = request.toCommand(user.groupId?: throw UnauthorizedException(UNAUTHORIZED_ACCESS))
         createInvitationCommandHandler.handleAsync(command)
     }
 
