@@ -14,6 +14,7 @@ import org.ptss.support.api.dtos.responses.groups.GroupResponse
 import org.ptss.support.api.dtos.responses.invitations.InvitationResponse
 import org.ptss.support.api.dtos.responses.users.UserResponse
 import org.ptss.support.common.pagination.CursorPage
+import org.ptss.support.domain.constants.PaginationConstants.DEFAULT_LIMIT
 import org.ptss.support.domain.enums.Role
 import org.ptss.support.security.Authentication
 import java.util.UUID
@@ -37,7 +38,7 @@ interface IGroupController {
         )
     )
     suspend fun getAllGroups(
-        @QueryParam("limit") limit: Int?,
+        @QueryParam("limit") limit: Int = DEFAULT_LIMIT,
         @QueryParam("cursor") cursor: UUID?
     ): CursorPage<GroupResponse>
 

@@ -14,7 +14,7 @@ class UserController @Inject constructor(
     private val userFacade: IUserFacade
 ) : IUserController {
 
-    override suspend fun getAllUsers(limit: Int?, cursor: UUID?): CursorPage<UserResponse> {
+    override suspend fun getAllUsers(limit: Int, cursor: UUID?): CursorPage<UserResponse> {
         return userFacade.getAllUsers(limit, cursor)
     }
 

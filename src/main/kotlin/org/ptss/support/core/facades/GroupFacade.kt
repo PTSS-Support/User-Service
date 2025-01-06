@@ -40,7 +40,7 @@ class GroupFacade(
     private val userContext: AuthenticatedUserContext
 ) : IGroupFacade {
 
-    override suspend fun getAllGroups(limit: Int?, cursor: UUID?): CursorPage<GroupResponse> {
+    override suspend fun getAllGroups(limit: Int, cursor: UUID?): CursorPage<GroupResponse> {
         val query = GetAllGroupsQuery(limit, cursor)
         return getAllGroupsQueryHandler.handleAsync(query)
             .mapItems { it.toResponse() }

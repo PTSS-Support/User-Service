@@ -27,7 +27,7 @@ class UserFacade(
     private val userContext: AuthenticatedUserContext
 ) : IUserFacade {
 
-    override suspend fun getAllUsers(limit: Int?, cursor: UUID?): CursorPage<UserResponse> {
+    override suspend fun getAllUsers(limit: Int, cursor: UUID?): CursorPage<UserResponse> {
         val query = GetAllUsersQuery(limit, cursor)
         return getAllUsersQueryHandler.handleAsync(query)
             .mapItems { it.toResponse() }
