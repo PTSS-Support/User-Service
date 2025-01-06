@@ -22,7 +22,6 @@ interface IInvitationController {
     @POST
     @Path("/invite")
     @Operation(summary = "Invite user to join group")
-    @Authentication(roles = [Role.PATIENT, Role.PRIMARY_CAREGIVER])
     @APIResponses(
         APIResponse(
             responseCode = "201",
