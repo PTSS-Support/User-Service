@@ -44,12 +44,15 @@ class InvitationFacade(
         val createdUser = registerUserCommandHandler.handleAsync(command)
 
         // If the registered user is a patient, assign them to their group
-        if (createdUser.role == Role.PATIENT && createdUser.groupId != null) {
-            val assignCommand = AssignPatientToGroupCommand(
-                groupId = createdUser.groupId,
-                patientId = createdUser.id
-            )
-            assignPatientToGroupCommandHandler.handleAsync(assignCommand)
+        if (createdUser.role == Role.PATIENT) {
+            createdUser.groupId?.let { groupId ->
+                assignPatientToGroupCommandHandler.handleAsync(
+                    AssignPatientToGroupCommand(
+                        groupId = groupId,
+                        patientId = createdUser.id
+                    )
+                )
+            }
         }
     }
 }
