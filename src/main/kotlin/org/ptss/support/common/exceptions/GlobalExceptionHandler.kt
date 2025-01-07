@@ -185,7 +185,7 @@ class GlobalExceptionHandler @Inject constructor(
                 Log.warn("Optimistic lock exception occurred for request $requestId at path $path: ${exception.message}")
                 createResponse(
                     errorCode = ErrorCode.CONFLICT,
-                    message = "Resource was modified by another operation, please try it again later",
+                    message = "Resource was modified by another operation, please try again",
                     requestId = requestId
                 )
             }
