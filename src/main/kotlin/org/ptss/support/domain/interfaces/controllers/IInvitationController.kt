@@ -1,5 +1,6 @@
 package org.ptss.support.domain.interfaces.controllers
 
+import jakarta.validation.Valid
 import jakarta.ws.rs.Consumes
 import jakarta.ws.rs.POST
 import jakarta.ws.rs.Path
@@ -22,7 +23,6 @@ interface IInvitationController {
     @POST
     @Path("/invite")
     @Operation(summary = "Invite user to join group")
-    @Authentication(roles = [Role.PATIENT, Role.PRIMARY_CAREGIVER])
     @APIResponses(
         APIResponse(
             responseCode = "201",
@@ -37,7 +37,7 @@ interface IInvitationController {
             description = "Forbidden"
         )
     )
-    suspend fun inviteUser(request: CreateInvitationRequest): Response
+    suspend fun inviteUser(@Valid request: CreateInvitationRequest): Response
 
     @POST
     @Path("/invite/verify")
@@ -56,7 +56,7 @@ interface IInvitationController {
             description = "Invitation not found or expired"
         )
     )
-    suspend fun verifyInvitation(request: UserInvitationVerificationRequest): Response
+    suspend fun verifyInvitation(@Valid request: UserInvitationVerificationRequest): Response
 
     @POST
     @Path("/register")
@@ -71,5 +71,5 @@ interface IInvitationController {
             description = "Invalid parameters"
         )
     )
-    suspend fun registerUser(request: UserRegistrationRequest): Response
+    suspend fun registerUser(@Valid request: UserRegistrationRequest): Response
 }

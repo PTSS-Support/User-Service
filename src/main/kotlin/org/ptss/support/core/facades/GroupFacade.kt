@@ -1,6 +1,8 @@
 package org.ptss.support.core.facades
 
+import io.quarkus.logging.Log
 import jakarta.enterprise.context.ApplicationScoped
+import jakarta.ws.rs.BadRequestException
 import org.ptss.support.api.dtos.requests.groups.CreateGroupRequest
 import org.ptss.support.api.dtos.requests.toCreateGroupCommand
 import org.ptss.support.api.dtos.requests.toCreateInvitationCommand
@@ -12,6 +14,7 @@ import org.ptss.support.api.dtos.responses.toResponse
 import org.ptss.support.api.dtos.responses.toUserResponse
 import org.ptss.support.common.pagination.CursorPage
 import org.ptss.support.common.pagination.mapItems
+import org.ptss.support.domain.constants.SecurityMessages.MISSING_GROUP
 import org.ptss.support.domain.interfaces.facades.IGroupFacade
 import org.ptss.support.domain.interfaces.commands.groups.ICreateGroupCommandHandler
 import org.ptss.support.domain.interfaces.commands.invitations.ICreateInvitationCommandHandler
@@ -23,6 +26,7 @@ import org.ptss.support.domain.queries.groups.GetAllGroupsQuery
 import org.ptss.support.domain.queries.groups.GetGroupMembersQuery
 import org.ptss.support.domain.queries.groups.GetGroupUsersQuery
 import org.ptss.support.domain.queries.invitations.GetPendingInvitationsByGroupQuery
+import org.ptss.support.security.context.AuthenticatedUserContext
 import java.util.UUID
 
 @ApplicationScoped
@@ -32,10 +36,11 @@ class GroupFacade(
     private val getAllGroupsQueryHandler: IGetAllGroupsQueryHandler,
     private val getGroupMembersQueryHandler: IGetGroupMembersQueryHandler,
     private val getGroupUsersQueryHandler: IGetGroupUsersQueryHandler,
-    private val getPendingGroupInvitationsByGroupQueryHandler: IGetPendingInvitationsByGroupQueryHandler
+    private val getPendingGroupInvitationsByGroupQueryHandler: IGetPendingInvitationsByGroupQueryHandler,
+    private val userContext: AuthenticatedUserContext
 ) : IGroupFacade {
 
-    override suspend fun getAllGroups(limit: Int?, cursor: UUID?): CursorPage<GroupResponse> {
+    override suspend fun getAllGroups(limit: Int, cursor: UUID?): CursorPage<GroupResponse> {
         val query = GetAllGroupsQuery(limit, cursor)
         return getAllGroupsQueryHandler.handleAsync(query)
             .mapItems { it.toResponse() }
@@ -54,10 +59,10 @@ class GroupFacade(
     }
 
     override suspend fun getGroupMembers(): List<UserResponse> {
+        val user = userContext.getCurrentUser()
+        Log.info("Authenticated user $user with groupId ${user.groupId?: "ILLEGAL STATE"}")
         val query = GetGroupMembersQuery(
-            // Note: The specific group ID should come from the current user's context
-            // This would typically be injected via a security context or similar
-            groupId = UUID.randomUUID() // TODO: Replace with actual group ID from context
+            groupId = user.groupId?: throw BadRequestException(MISSING_GROUP)
         )
         return getGroupMembersQueryHandler.handleAsync(query)
             .toUserResponse()
@@ -70,10 +75,10 @@ class GroupFacade(
     }
 
     override suspend fun getPendingGroupInvitations(): List<InvitationResponse> {
+        val user = userContext.getCurrentUser()
+        Log.info("Authenticated user $user with groupId ${user.groupId?: "ILLEGAL STATE"}")
         val query = GetPendingInvitationsByGroupQuery(
-            // Note: The specific group ID should come from the current user's context
-            // This would typically be injected via a security context or similar
-            groupId = UUID.randomUUID() // TODO: Replace with actual group ID from context
+            groupId = user.groupId?: throw BadRequestException(MISSING_GROUP)
         )
         return getPendingGroupInvitationsByGroupQueryHandler.handleAsync(query)
             .toInvitationResponse()

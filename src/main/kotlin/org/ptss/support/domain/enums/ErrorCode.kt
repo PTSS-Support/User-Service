@@ -27,6 +27,8 @@ enum class ErrorCode(
     RATE_LIMIT_EXCEEDED("RATE_LIMIT_EXCEEDED", 429, "Too many requests"),
     SERVICE_UNAVAILABLE("SERVICE_UNAVAILABLE", 503, "Service temporarily unavailable"),
     GATEWAY_TIMEOUT("GATEWAY_TIMEOUT", 504, "Request timed out"),
+    CONFLICT("CONFLICT", 409, "Resource was modified by another operation"),
+    METHOD_NOT_ALLOWED("METHOD_NOT_ALLOWED", 405, "Invalid or unallowed method provided"),
 
     // Product errors
     PRODUCT_NOT_FOUND("PRODUCT_NOT_FOUND", 404, "The requested product was not found"),

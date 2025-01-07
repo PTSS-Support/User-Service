@@ -6,14 +6,17 @@ import jakarta.ws.rs.core.Response
 import org.ptss.support.api.dtos.requests.invitations.CreateInvitationRequest
 import org.ptss.support.api.dtos.requests.invitations.UserInvitationVerificationRequest
 import org.ptss.support.api.dtos.requests.invitations.UserRegistrationRequest
+import org.ptss.support.domain.enums.Role
 import org.ptss.support.domain.interfaces.facades.IInvitationFacade
 import org.ptss.support.domain.interfaces.controllers.IInvitationController
+import org.ptss.support.security.Authentication
 
 @ApplicationScoped
 class InvitationController @Inject constructor(
     private val invitationFacade: IInvitationFacade
 ) : IInvitationController {
 
+    @Authentication(roles = [Role.PATIENT, Role.PRIMARY_CAREGIVER])
     override suspend fun inviteUser(request: CreateInvitationRequest): Response {
         invitationFacade.inviteUser(request)
         return Response.status(Response.Status.CREATED).build()
