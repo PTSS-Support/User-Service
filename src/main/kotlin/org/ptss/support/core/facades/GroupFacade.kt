@@ -3,7 +3,9 @@ package org.ptss.support.core.facades
 import io.quarkus.logging.Log
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.ws.rs.BadRequestException
+import org.ptss.support.api.dtos.requests.groups.AssignPrimaryCaregiverRequest
 import org.ptss.support.api.dtos.requests.groups.CreateGroupRequest
+import org.ptss.support.api.dtos.requests.toCommand
 import org.ptss.support.api.dtos.requests.toCreateGroupCommand
 import org.ptss.support.api.dtos.requests.toCreateInvitationCommand
 import org.ptss.support.api.dtos.responses.groups.GroupResponse
@@ -14,9 +16,12 @@ import org.ptss.support.api.dtos.responses.toResponse
 import org.ptss.support.api.dtos.responses.toUserResponse
 import org.ptss.support.common.pagination.CursorPage
 import org.ptss.support.common.pagination.mapItems
+import org.ptss.support.domain.commands.groups.RemovePrimaryCaregiverFromGroupCommand
 import org.ptss.support.domain.constants.SecurityMessages.MISSING_GROUP
+import org.ptss.support.domain.interfaces.commands.groups.IAssignPrimaryCaregiverToGroupCommandHandler
 import org.ptss.support.domain.interfaces.facades.IGroupFacade
 import org.ptss.support.domain.interfaces.commands.groups.ICreateGroupCommandHandler
+import org.ptss.support.domain.interfaces.commands.groups.IRemovePrimaryCaregiverFromGroupCommandHandler
 import org.ptss.support.domain.interfaces.commands.invitations.ICreateInvitationCommandHandler
 import org.ptss.support.domain.interfaces.queries.groups.IGetAllGroupsQueryHandler
 import org.ptss.support.domain.interfaces.queries.groups.IGetGroupMembersQueryHandler
@@ -37,6 +42,8 @@ class GroupFacade(
     private val getGroupMembersQueryHandler: IGetGroupMembersQueryHandler,
     private val getGroupUsersQueryHandler: IGetGroupUsersQueryHandler,
     private val getPendingGroupInvitationsByGroupQueryHandler: IGetPendingInvitationsByGroupQueryHandler,
+    private val assignPrimaryCaregiverCommandHandler: IAssignPrimaryCaregiverToGroupCommandHandler,
+    private val removePrimaryCaregiverCommandHandler: IRemovePrimaryCaregiverFromGroupCommandHandler,
     private val userContext: AuthenticatedUserContext
 ) : IGroupFacade {
 
@@ -82,5 +89,25 @@ class GroupFacade(
         )
         return getPendingGroupInvitationsByGroupQueryHandler.handleAsync(query)
             .toInvitationResponse()
+    }
+
+    override suspend fun assignPrimaryCaregiver(request: AssignPrimaryCaregiverRequest): GroupResponse {
+        val user = userContext.getCurrentUser()
+        Log.info("Attempting to assign primary caregiver for group ${user.groupId}")
+
+        val command = request.toCommand(user.groupId ?: throw BadRequestException(MISSING_GROUP))
+
+        return assignPrimaryCaregiverCommandHandler.handleAsync(command).toResponse()
+    }
+
+    override suspend fun removePrimaryCaregiver() {
+        val user = userContext.getCurrentUser()
+        Log.info("Attempting to remove primary caregiver from group ${user.groupId}")
+
+        val command = RemovePrimaryCaregiverFromGroupCommand(
+            groupId = user.groupId ?: throw BadRequestException(MISSING_GROUP)
+        )
+
+        removePrimaryCaregiverCommandHandler.handleAsync(command)
     }
 }

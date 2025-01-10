@@ -5,7 +5,7 @@ import jakarta.persistence.*
 import org.hibernate.annotations.Check
 import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
-import java.util.*
+import java.util.UUID
 import kotlin.collections.HashSet
 
 @Entity

@@ -2,6 +2,8 @@ package org.ptss.support.api.controllers
 
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
+import jakarta.ws.rs.core.Response
+import org.ptss.support.api.dtos.requests.groups.AssignPrimaryCaregiverRequest
 import org.ptss.support.api.dtos.requests.groups.CreateGroupRequest
 import org.ptss.support.api.dtos.responses.groups.GroupResponse
 import org.ptss.support.api.dtos.responses.invitations.InvitationResponse
@@ -41,5 +43,16 @@ class GroupController @Inject constructor(
     @Authentication(roles = [Role.ADMIN, Role.HCP, Role.PATIENT, Role.PRIMARY_CAREGIVER, Role.FAMILY_MEMBER])
     override suspend fun getPendingGroupInvitations(): List<InvitationResponse> {
         return groupFacade.getPendingGroupInvitations()
+    }
+
+    @Authentication(roles = [Role.PATIENT])
+    override suspend fun assignPrimaryCaregiver(request: AssignPrimaryCaregiverRequest): GroupResponse {
+        return groupFacade.assignPrimaryCaregiver(request)
+    }
+
+    @Authentication(roles = [Role.PATIENT])
+    override suspend fun removePrimaryCaregiver(): Response {
+        groupFacade.removePrimaryCaregiver()
+        return Response.noContent().build()
     }
 }

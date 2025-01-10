@@ -38,6 +38,9 @@ object ValidationMessages {
     // Healthcare professional validation messages
     const val EMPTY_HEALTHCARE_PROFESSIONAL_ID = "Zorgverlener ID $EMPTY_NAME"
 
+    // Member validation messages
+    const val EMPTY_MEMBER_ID = "Lid ID $EMPTY_NAME"
+
     // Invitable role validation messages
     const val UNINVITABLE_ROLE = "Only patients and family members can be invited"
 }

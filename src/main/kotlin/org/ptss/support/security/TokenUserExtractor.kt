@@ -15,7 +15,8 @@ import jakarta.json.JsonNumber
 import jakarta.json.JsonString
 import jakarta.json.JsonValue
 import org.eclipse.microprofile.jwt.JsonWebToken
-import java.util.*
+import java.util.UUID
+import java.util.Optional
 
 @ApplicationScoped
 class TokenUserExtractor @Inject constructor(
