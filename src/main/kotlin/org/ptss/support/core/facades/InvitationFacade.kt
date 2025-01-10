@@ -35,7 +35,7 @@ class InvitationFacade(
         val command = request.toCommand(user.groupId?: throw UnauthorizedException(UNAUTHORIZED_ACCESS))
         val invitation = createInvitationCommandHandler.handleAsync(command)
 
-        Log.info("Sending invitation email with verificationCode: ${invitation.verificationCode}")
+        Log.info("Sending invitation email with verificationCode: ${invitation.verificationCode.dropLast(3)}***")
         emailService.sendEmail(
             EmailTemplates.invitationEmail(
                 email = invitation.email,
