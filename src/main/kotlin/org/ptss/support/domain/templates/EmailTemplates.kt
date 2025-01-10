@@ -7,20 +7,20 @@ import org.ptss.support.domain.models.EmailTemplate
 object EmailTemplates {
     fun invitationEmail(email: String, verificationCode: String) = EmailTemplate(
         to = email,
-        subject = "Your Invitation to PTSS Support",
+        subject = "Uw uitnodiging tot PTSS Support",
         content = """
-            <h1>Welcome to PTSS Support!</h1>
+            <h1>Welkom bij PTSS Support!</h1>
+    
+            <p>Je bent uitgenodigd om deel te nemen aan ons platform. Om je registratie te voltooien, 
+            gebruik de volgende verificatiecode:</p>
             
-            <p>You have been invited to join our platform. To complete your registration, 
-            please use the following verification code:</p>
-            
-            <div style="background-color: #f5f5f5; padding: 15px; margin: 20px 0; text-align: center; font-size: 24px;">
+            <div class="code-box">
                 <strong>$verificationCode</strong>
             </div>
             
-            <p>This code will expire in ${InvitationProperties.validityHours} hours.</p>
+            <p>Deze code verloopt over <strong>${InvitationProperties.validityHours} uur.</strong></p>
             
-            <p>Best regards,<br>
+            <p>Met vriendelijke groet,<br>
             PTSS Support Team</p>
         """.trimIndent()
     )
@@ -29,18 +29,18 @@ object EmailTemplates {
         to = email,
         subject = "Password Reset Request",
         content = """
-            <h1>Password Reset Request</h1>
+            <h1>Wachtwoord Herstellen</h1>
+        
+            <p>We hebben een verzoek ontvangen om je wachtwoord te herstellen. Gebruik de volgende code
+            om verder te gaan met het herstellen van je wachtwoord:</p>
             
-            <p>We received a request to reset your password. Use the following code
-            to proceed with your password reset:</p>
-            
-            <div style="background-color: #f5f5f5; padding: 15px; margin: 20px 0; text-align: center; font-size: 24px;">
+            <div class="code-box">
                 <strong>$resetCode</strong>
             </div>
             
-            <p>If you didn't request this reset, please ignore this email.</p>
+            <p><strong>Als je geen herstelverzoek hebt ingediend</strong>, kun je deze e-mail negeren.</p>
             
-            <p>Best regards,<br>
+            <p>Met vriendelijke groet,<br>
             PTSS Support Team</p>
         """.trimIndent()
     )
