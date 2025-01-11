@@ -30,7 +30,7 @@ class AssignPrimaryCaregiverToGroupCommandHandler : IAssignPrimaryCaregiverToGro
                 Log.error("Group not found with ID: ${command.groupId}")
             }
 
-        // Check if the user is already a primary caregiver
+        // Check if the group already has a primary caregiver
         if (group.primaryCaregiver != null) {
             throw BadRequestException("Group already has a primary caregiver assigned")
         }
@@ -38,7 +38,7 @@ class AssignPrimaryCaregiverToGroupCommandHandler : IAssignPrimaryCaregiverToGro
         // Find the family member entity
         val familyMember = GroupFamilyMemberEntity
             .find("group.id = ?1 and user.id = ?2", command.groupId, command.memberId)
-            .firstResult() ?: throw BadRequestException("User must be a family member first")
+            .firstResult() ?: throw BadRequestException("User must be a family member of the group first")
 
         // Promote to primary caregiver
         group.promoteToPrimaryCaregiver(familyMember)
