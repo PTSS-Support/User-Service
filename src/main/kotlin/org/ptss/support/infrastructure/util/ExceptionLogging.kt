@@ -1,8 +1,8 @@
 package org.ptss.support.infrastructure.util
 
-import org.slf4j.Logger
+import io.quarkus.logging.Log
 
-suspend fun <T> Logger.executeWithExceptionLoggingAsync(
+suspend fun <T> executeWithExceptionLoggingAsync(
     operation: suspend () -> T,
     logMessage: String,
     exceptionHandling: ((Exception) -> Exception)? = null,
@@ -11,7 +11,7 @@ suspend fun <T> Logger.executeWithExceptionLoggingAsync(
     return try {
         operation()
     } catch (ex: Exception) {
-        this.error(logMessage.format(*args), ex)
+        Log.error(logMessage.format(*args), ex)
         throw exceptionHandling?.invoke(ex) ?: ex
     }
 }

@@ -15,6 +15,8 @@ import org.ptss.support.domain.interfaces.commands.invitations.ICreateInvitation
 import org.ptss.support.domain.interfaces.commands.invitations.IRegisterUserCommandHandler
 import org.ptss.support.domain.interfaces.commands.invitations.IVerifyInvitationCommandHandler
 import org.ptss.support.domain.interfaces.facades.IInvitationFacade
+import org.ptss.support.domain.interfaces.services.IEmailService
+import org.ptss.support.domain.templates.EmailTemplates
 import org.ptss.support.security.context.AuthenticatedUserContext
 
 @ApplicationScoped
@@ -23,6 +25,7 @@ class InvitationFacade(
     private val verifyInvitationCommandHandler: IVerifyInvitationCommandHandler,
     private val registerUserCommandHandler: IRegisterUserCommandHandler,
     private val assignPatientToGroupCommandHandler: IAssignPatientToGroupCommandHandler,
+    private val emailService: IEmailService,
     private val userContext: AuthenticatedUserContext
 ) : IInvitationFacade {
 
@@ -30,7 +33,15 @@ class InvitationFacade(
         val user = userContext.getCurrentUser()
         Log.info("Authenticated user $user with groupId ${user.groupId?: "ILLEGAL STATE"}")
         val command = request.toCommand(user.groupId?: throw UnauthorizedException(UNAUTHORIZED_ACCESS))
-        createInvitationCommandHandler.handleAsync(command)
+        val invitation = createInvitationCommandHandler.handleAsync(command)
+
+        Log.info("Sending invitation email with verificationCode: ${invitation.verificationCode.dropLast(3)}***")
+        emailService.sendEmail(
+            EmailTemplates.invitationEmail(
+                email = invitation.email,
+                verificationCode = invitation.verificationCode
+            )
+        )
     }
 
     override suspend fun verifyInvitation(request: UserInvitationVerificationRequest) {

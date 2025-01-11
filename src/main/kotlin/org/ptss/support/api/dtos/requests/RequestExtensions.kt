@@ -7,10 +7,12 @@
 // 4. Allow for complex transformations with additional parameters
 package org.ptss.support.api.dtos.requests
 
+import org.ptss.support.api.dtos.requests.groups.AssignPrimaryCaregiverRequest
 import org.ptss.support.api.dtos.requests.groups.CreateGroupRequest
 import org.ptss.support.api.dtos.requests.invitations.CreateInvitationRequest
 import org.ptss.support.api.dtos.requests.invitations.UserInvitationVerificationRequest
 import org.ptss.support.api.dtos.requests.invitations.UserRegistrationRequest
+import org.ptss.support.domain.commands.groups.AssignPrimaryCaregiverToGroupCommand
 import org.ptss.support.domain.commands.groups.CreateGroupCommand
 import org.ptss.support.domain.commands.invitations.CreateInvitationCommand
 import org.ptss.support.domain.commands.invitations.RegisterUserCommand
@@ -26,6 +28,11 @@ fun CreateGroupRequest.toCreateInvitationCommand(groupId: UUID) = CreateInvitati
     email = this.patientEmail,
     role = Role.PATIENT, // Patient role for group creation invitations
     groupId = groupId
+)
+
+fun AssignPrimaryCaregiverRequest.toCommand(groupId: UUID) = AssignPrimaryCaregiverToGroupCommand(
+    groupId = groupId,
+    memberId = this.memberId
 )
 
 fun CreateInvitationRequest.toCommand(groupId: UUID) = CreateInvitationCommand(

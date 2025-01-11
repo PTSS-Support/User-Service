@@ -1,5 +1,6 @@
 package org.ptss.support.security
 
+import io.quarkus.logging.Log
 import io.quarkus.security.UnauthorizedException
 import io.smallrye.jwt.auth.principal.JWTParser
 import jakarta.enterprise.context.ApplicationScoped
@@ -9,11 +10,15 @@ import org.ptss.support.domain.enums.ErrorCode
 import org.ptss.support.domain.enums.Role
 import org.ptss.support.security.context.UserContext
 import io.smallrye.jwt.auth.principal.JWTAuthContextInfo
+import jakarta.json.Json
 import jakarta.json.JsonArray
+import jakarta.json.JsonException
 import jakarta.json.JsonValue
 import org.eclipse.microprofile.jwt.JsonWebToken
+import org.ptss.support.security.jwt.SimpleJsonWebToken
 import java.util.Optional
 import java.util.UUID
+import java.util.Base64
 
 @ApplicationScoped
 class TokenUserExtractor @Inject constructor(
@@ -27,9 +32,12 @@ class TokenUserExtractor @Inject constructor(
         }.recoverCatching { error ->
             when (error) {
                 is APIException -> throw error
-                else -> throw UnauthorizedException(
-                    "Failed to verify token",
-                )
+                else -> run {
+                    Log.info(error.message)
+                    throw UnauthorizedException(
+                        "Failed to verify token",
+                    )
+                }
             }
         }
     }
@@ -42,22 +50,40 @@ class TokenUserExtractor @Inject constructor(
         }
     }
 
-    private fun parseJWT(token: String, keycloakPublicKey: Optional<String>, jwtValidationEnabled: Boolean) =
+    private fun parseJWT(token: String, keycloakPublicKey: Optional<String>, jwtValidationEnabled: Boolean): JsonWebToken {
         if (jwtValidationEnabled) {
             val authContext = JWTAuthContextInfo().apply {
                 publicKeyContent = keycloakPublicKey.orElse("")
             }
-            jwtParser.parse(token, authContext)
-        } else {
-            jwtParser.parse(token)
+            return jwtParser.parse(token, authContext)
         }
+        Log.info("JWT validation is disabled")
+        return parseUnvalidatedJWT(token)
+    }
+
+    private fun parseUnvalidatedJWT(token: String): JsonWebToken {
+        val parts = token.split(".")
+        if (parts.size != 3) {
+            throw UnauthorizedException("Invalid JWT format: expected 3 parts but got ${parts.size}")
+        }
+
+        return try {
+            val payload = String(Base64.getDecoder().decode(parts[1]))
+            val claims = Json.createReader(payload.byteInputStream()).readObject()
+            SimpleJsonWebToken(token, claims)
+        } catch (e: IllegalArgumentException) {
+            throw UnauthorizedException("Invalid JWT base64 encoding", e)
+        } catch (e: JsonException) {
+            throw UnauthorizedException("Invalid JWT payload JSON", e)
+        }
+    }
 
     private fun createUserContext(jwt: JsonWebToken): UserContext {
         val userId = extractUserId(jwt)
         return UserContext(
             userId = userId,
             groupId = extractGroupId(jwt),
-            roles = extractRoles(jwt),
+            roles = extractRole(jwt),
             hasPin = extractHasPin(jwt)
         )
     }
@@ -70,9 +96,13 @@ class TokenUserExtractor @Inject constructor(
     private fun extractGroupId(jwt: JsonWebToken): UUID? =
         jwt.getClaim<String>("group_id")?.let { runCatching { UUID.fromString(it) }.getOrNull() }
 
-    private fun extractRoles(jwt: JsonWebToken): Set<Role> {
-        val rolesClaim = jwt.getClaim<Any>("roles")
-        return when (rolesClaim) {
+    private fun extractRole(jwt: JsonWebToken): Set<Role> {
+        val specificRole = jwt.getClaim<String>("role")?.let {
+            runCatching { Role.fromString(it.trim()) }.getOrNull()
+        }
+
+        // Then, extract any system roles from the "roles" array
+        val systemRoles = when (val rolesClaim = jwt.getClaim<Any>("roles")) {
             is List<*> -> rolesClaim
             is JsonValue -> when (rolesClaim.valueType) {
                 JsonValue.ValueType.ARRAY -> (rolesClaim as JsonArray).map { it.toString() }
@@ -82,7 +112,10 @@ class TokenUserExtractor @Inject constructor(
         }.mapNotNull { role ->
             val cleanRole = role.toString().trim('"').trim()
             runCatching { Role.fromString(cleanRole) }.getOrNull()
-        }.toSet()
+        }
+
+        // Combine the specific role with system roles, filtering out any nulls
+        return (listOfNotNull(specificRole) + systemRoles).toSet()
     }
 
     private fun extractHasPin(jwt: JsonWebToken): Boolean =

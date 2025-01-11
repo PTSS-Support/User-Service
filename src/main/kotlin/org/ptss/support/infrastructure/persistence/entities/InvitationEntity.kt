@@ -57,19 +57,17 @@ class InvitationEntity : BaseEntity() {
             UNINVITABLE_ROLE
         }
 
-        if (!::verificationCode.isInitialized) {
-            verificationCode = generateVerificationCode()
-        }
         if (!::expiresAt.isInitialized) {
             expiresAt = OffsetDateTime.now().plusHours(InvitationProperties.validityHours)
         }
     }
 
-    private fun generateVerificationCode(): String {
-        return buildString {
+    fun generateAndSetVerificationCode(): String {
+        verificationCode = buildString {
             repeat(VERIFICATION_CODE_LENGTH) {
                 append((0..9).random())
             }
         }
+        return verificationCode
     }
 }

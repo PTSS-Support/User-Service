@@ -3,12 +3,14 @@ package org.ptss.support.domain.interfaces.controllers
 import jakarta.validation.Valid
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
+import jakarta.ws.rs.core.Response
 import org.eclipse.microprofile.openapi.annotations.Operation
 import org.eclipse.microprofile.openapi.annotations.media.Content
 import org.eclipse.microprofile.openapi.annotations.media.Schema
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
+import org.ptss.support.api.dtos.requests.groups.AssignPrimaryCaregiverRequest
 import org.ptss.support.api.dtos.requests.groups.CreateGroupRequest
 import org.ptss.support.api.dtos.responses.groups.GroupResponse
 import org.ptss.support.api.dtos.responses.invitations.InvitationResponse
@@ -110,4 +112,35 @@ interface IGroupController {
         )
     )
     suspend fun getPendingGroupInvitations(): List<InvitationResponse>
+
+    @PUT
+    @Path("/primary-caregiver")
+    @Operation(summary = "Assign primary caregiver to current user's group", description = "Patient can assign a user as the primary caregiver for their group")
+    @APIResponses(
+        APIResponse(
+            responseCode = "200",
+            description = "Primary caregiver assigned successfully",
+            content = [Content(schema = Schema(implementation = GroupResponse::class))]
+        ),
+        APIResponse(
+            responseCode = "403",
+            description = "Forbidden"
+        )
+    )
+    suspend fun assignPrimaryCaregiver(@Valid request: AssignPrimaryCaregiverRequest): GroupResponse
+
+    @DELETE
+    @Path("/primary-caregiver")
+    @Operation(summary = "Remove primary caregiver from current user's group", description = "Patient can remove the primary caregiver from their group")
+    @APIResponses(
+        APIResponse(
+            responseCode = "204",
+            description = "Primary caregiver removed successfully"
+        ),
+        APIResponse(
+            responseCode = "403",
+            description = "Forbidden"
+        )
+    )
+    suspend fun removePrimaryCaregiver(): Response
 }
