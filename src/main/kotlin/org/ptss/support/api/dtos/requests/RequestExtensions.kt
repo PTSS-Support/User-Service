@@ -7,11 +7,17 @@
 // 4. Allow for complex transformations with additional parameters
 package org.ptss.support.api.dtos.requests
 
+import org.ptss.support.api.dtos.requests.forgot_password.PasswordResetVerificationRequest
+import org.ptss.support.api.dtos.requests.forgot_password.RequestPasswordResetRequest
+import org.ptss.support.api.dtos.requests.forgot_password.ResetPasswordRequest
 import org.ptss.support.api.dtos.requests.groups.AssignPrimaryCaregiverRequest
 import org.ptss.support.api.dtos.requests.groups.CreateGroupRequest
 import org.ptss.support.api.dtos.requests.invitations.CreateInvitationRequest
 import org.ptss.support.api.dtos.requests.invitations.UserInvitationVerificationRequest
 import org.ptss.support.api.dtos.requests.invitations.UserRegistrationRequest
+import org.ptss.support.domain.commands.forgot_password.RequestPasswordResetCommand
+import org.ptss.support.domain.commands.forgot_password.ResetPasswordCommand
+import org.ptss.support.domain.commands.forgot_password.VerifyPasswordResetCommand
 import org.ptss.support.domain.commands.groups.AssignPrimaryCaregiverToGroupCommand
 import org.ptss.support.domain.commands.groups.CreateGroupCommand
 import org.ptss.support.domain.commands.invitations.CreateInvitationCommand
@@ -51,4 +57,18 @@ fun UserRegistrationRequest.toCommand() = RegisterUserCommand(
     lastName = this.lastName,
     password = this.password,
     invitationCode = this.invitationCode
+)
+
+fun RequestPasswordResetRequest.toCommand() = RequestPasswordResetCommand(
+    email = this.email
+)
+
+fun PasswordResetVerificationRequest.toCommand() = VerifyPasswordResetCommand(
+    email = this.email,
+    resetCode = this.resetCode
+)
+
+fun ResetPasswordRequest.toCommand() = ResetPasswordCommand(
+    resetCode = this.resetCode,
+    newPassword = this.newPassword
 )

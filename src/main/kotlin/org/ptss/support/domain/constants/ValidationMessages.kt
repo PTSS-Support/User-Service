@@ -32,8 +32,12 @@ object ValidationMessages {
             "1 hoofdletter, 1 cijfer en 1 speciaal karakter"
 
     // Verification code validation messages
-    const val EMPTY_VERIFICATION_CODE = "Uitnodigingscode $EMPTY_NAME"
-    const val INVALID_VERIFICATION_CODE = "Uitnodigingscode moet exact $VERIFICATION_CODE_LENGTH cijfers bevatten"
+    const val EMPTY_INVITATION_VERIFICATION_CODE = "Uitnodigingscode $EMPTY_NAME"
+    const val INVALID_INVITATION_VERIFICATION_CODE = "Uitnodigingscode moet exact $VERIFICATION_CODE_LENGTH cijfers bevatten"
+
+    // Verification code validation messages
+    const val EMPTY_RESET_PASSWORD_VERIFICATION_CODE = "Uitnodigingscode $EMPTY_NAME"
+    const val INVALID_RESET_PASSWORD_VERIFICATION_CODE = "Uitnodigingscode moet exact $VERIFICATION_CODE_LENGTH cijfers bevatten"
 
     // Healthcare professional validation messages
     const val EMPTY_HEALTHCARE_PROFESSIONAL_ID = "Zorgverlener ID $EMPTY_NAME"
