@@ -1,11 +1,10 @@
 package org.ptss.support.domain.templates
 
 import org.ptss.support.domain.config.InvitationProperties
-import org.ptss.support.domain.models.EmailTemplate
 
 // Kept in one object for now since we only have two templates
 object EmailTemplates {
-    fun invitationEmail(email: String, verificationCode: String) = EmailTemplate(
+    fun invitationEmail(email: String, verificationCode: String) = BaseEmailTemplate(
         to = email,
         subject = "Uw uitnodiging tot PTSS Support",
         content = """
@@ -25,7 +24,7 @@ object EmailTemplates {
         """.trimIndent()
     )
 
-    fun passwordResetEmail(email: String, resetCode: String) = EmailTemplate(
+    fun passwordResetEmail(email: String, resetCode: String) = BaseEmailTemplate(
         to = email,
         subject = "Password Reset Request",
         content = """

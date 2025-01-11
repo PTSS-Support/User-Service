@@ -1,7 +1,7 @@
 package org.ptss.support.domain.interfaces.services
 
-import org.ptss.support.domain.models.EmailTemplate
+import org.ptss.support.domain.templates.BaseEmailTemplate
 
 interface IEmailService {
-    suspend fun sendEmail(template: EmailTemplate)
+    suspend fun sendEmail(template: BaseEmailTemplate)
 }
