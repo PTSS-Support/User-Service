@@ -1,18 +1,18 @@
-package org.ptss.support.api.dtos.requests.invitations
+package org.ptss.support.api.dtos.requests.forgot_password
 
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
 import org.ptss.support.domain.constants.ValidationConstraints.EMAIL_MAX_LENGTH
-import org.ptss.support.domain.constants.ValidationConstraints.VERIFICATION_CODE_PATTERN
+import org.ptss.support.domain.constants.ValidationConstraints.PASSWORD_RESET_CODE_PATTERN
 import org.ptss.support.domain.constants.ValidationMessages.EMAIL_LENGTH
 import org.ptss.support.domain.constants.ValidationMessages.EMPTY_EMAIL
-import org.ptss.support.domain.constants.ValidationMessages.EMPTY_INVITATION_VERIFICATION_CODE
+import org.ptss.support.domain.constants.ValidationMessages.EMPTY_RESET_PASSWORD_VERIFICATION_CODE
 import org.ptss.support.domain.constants.ValidationMessages.INVALID_EMAIL
-import org.ptss.support.domain.constants.ValidationMessages.INVALID_INVITATION_VERIFICATION_CODE
+import org.ptss.support.domain.constants.ValidationMessages.INVALID_RESET_PASSWORD_VERIFICATION_CODE
 
-data class UserInvitationVerificationRequest(
+data class PasswordResetVerificationRequest(
     @field:NotBlank(message = EMPTY_EMAIL)
     @field:Email(message = INVALID_EMAIL)
     @field:Size(
@@ -21,10 +21,10 @@ data class UserInvitationVerificationRequest(
     )
     val email: String,
 
-    @field:NotBlank(message = EMPTY_INVITATION_VERIFICATION_CODE)
+    @field:NotBlank(message = EMPTY_RESET_PASSWORD_VERIFICATION_CODE)
     @field:Pattern(
-        regexp = VERIFICATION_CODE_PATTERN,
-        message = INVALID_INVITATION_VERIFICATION_CODE
+        regexp = PASSWORD_RESET_CODE_PATTERN,
+        message = INVALID_RESET_PASSWORD_VERIFICATION_CODE
     )
-    val invitationCode: String
+    val resetCode: String
 )

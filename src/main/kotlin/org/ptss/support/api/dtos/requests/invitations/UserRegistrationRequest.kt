@@ -8,14 +8,14 @@ import org.ptss.support.domain.constants.ValidationConstraints.NAME_PATTERN
 import org.ptss.support.domain.constants.ValidationConstraints.PASSWORD_PATTERN
 import org.ptss.support.domain.constants.ValidationConstraints.VERIFICATION_CODE_PATTERN
 import org.ptss.support.domain.constants.ValidationMessages.EMPTY_PASSWORD
-import org.ptss.support.domain.constants.ValidationMessages.EMPTY_VERIFICATION_CODE
+import org.ptss.support.domain.constants.ValidationMessages.EMPTY_INVITATION_VERIFICATION_CODE
 import org.ptss.support.domain.constants.ValidationMessages.EMPTY_FIRST_NAME
 import org.ptss.support.domain.constants.ValidationMessages.EMPTY_LAST_NAME
 import org.ptss.support.domain.constants.ValidationMessages.FIRST_NAME_LENGTH
 import org.ptss.support.domain.constants.ValidationMessages.LAST_NAME_LENGTH
 import org.ptss.support.domain.constants.ValidationMessages.FIRST_NAME_INVALID
 import org.ptss.support.domain.constants.ValidationMessages.INVALID_PASSWORD
-import org.ptss.support.domain.constants.ValidationMessages.INVALID_VERIFICATION_CODE
+import org.ptss.support.domain.constants.ValidationMessages.INVALID_INVITATION_VERIFICATION_CODE
 import org.ptss.support.domain.constants.ValidationMessages.LAST_NAME_INVALID
 
 data class UserRegistrationRequest(
@@ -48,10 +48,10 @@ data class UserRegistrationRequest(
     )
     val password: String,
 
-    @field:NotBlank(message = EMPTY_VERIFICATION_CODE)
+    @field:NotBlank(message = EMPTY_INVITATION_VERIFICATION_CODE)
     @field:Pattern(
         regexp = VERIFICATION_CODE_PATTERN,
-        message = INVALID_VERIFICATION_CODE
+        message = INVALID_INVITATION_VERIFICATION_CODE
     )
     val invitationCode: String
 )

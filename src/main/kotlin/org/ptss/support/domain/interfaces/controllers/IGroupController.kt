@@ -17,8 +17,6 @@ import org.ptss.support.api.dtos.responses.invitations.InvitationResponse
 import org.ptss.support.api.dtos.responses.users.UserResponse
 import org.ptss.support.common.pagination.CursorPage
 import org.ptss.support.domain.constants.PaginationConstants.DEFAULT_LIMIT
-import org.ptss.support.domain.enums.Role
-import org.ptss.support.security.Authentication
 import java.util.UUID
 
 @Path("/groups")
