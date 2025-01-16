@@ -1,4 +1,4 @@
-package org.ptss.support.infrastructure.external.authentication_service.dtos.requests
+package org.ptss.support.infrastructure.external_services.auth.dtos.requests
 
 data class UpdatePasswordRequest(
     val oldPassword: String,

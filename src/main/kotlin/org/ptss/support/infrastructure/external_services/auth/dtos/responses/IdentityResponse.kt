@@ -1,4 +1,4 @@
-package org.ptss.support.infrastructure.external.authentication_service.dtos.responses
+package org.ptss.support.infrastructure.external_services.auth.dtos.responses
 
 import org.ptss.support.domain.enums.Role
 
