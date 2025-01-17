@@ -11,6 +11,7 @@ import org.ptss.support.domain.interfaces.commands.forgot_password.IResetPasswor
 import org.ptss.support.infrastructure.external_services.auth.clients.IAuthenticationServiceClient
 import org.ptss.support.infrastructure.external_services.auth.dtos.requests.AuthResetPasswordRequest
 import org.ptss.support.infrastructure.persistence.entities.PasswordResetEntity
+import org.ptss.support.infrastructure.util.executeWithExceptionLoggingAsync
 import java.time.OffsetDateTime
 
 @ApplicationScoped
@@ -23,25 +24,25 @@ class ResetPasswordCommandHandler(
             validateAndGetResetEntity(command)
         }
 
-        try {
-            // Then call auth service to reset the password
-            authenticationServiceClient.resetPassword(
-                AuthResetPasswordRequest(
-                    email = resetEntity.email,
-                    newPassword = command.newPassword
+        executeWithExceptionLoggingAsync(
+            operation = {
+                // Then call auth service to reset the password
+                authenticationServiceClient.resetPassword(
+                    AuthResetPasswordRequest(
+                        email = resetEntity.email,
+                        newPassword = command.newPassword
+                    )
                 )
-            )
 
-            // If successful, mark the reset code as used in a new transaction
-            withContext(Dispatchers.IO) {
-                markResetCodeAsUsed(resetEntity)
-            }
+                // If successful, mark the reset code as used in a new transaction
+                withContext(Dispatchers.IO) {
+                    markResetCodeAsUsed(resetEntity)
+                }
 
-            Log.info("Successfully reset password for email: ${resetEntity.email}")
-        } catch (e: Exception) {
-            Log.error("Failed to reset password with authentication service", e)
-            throw e
-        }
+                Log.info("Successfully reset password for email: ${resetEntity.email}")
+            },
+            logMessage = "Failed to reset password with authentication service"
+        )
     }
 
     @Transactional
