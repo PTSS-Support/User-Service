@@ -11,11 +11,11 @@ import org.ptss.support.infrastructure.external_services.auth.dtos.requests.*
 interface AuthenticationServiceApi {
     @POST
     @Path("/login")
-    fun login(request: LoginRequest): Response
+    fun login(request: AuthLoginRequest): Response
 
     @POST
     @Path("/login/pin")
-    fun loginWithPin(request: PinLoginRequest): Response
+    fun loginWithPin(request: AuthPinLoginRequest): Response
 
     @POST
     @Path("/logout")
@@ -23,7 +23,7 @@ interface AuthenticationServiceApi {
 
     @POST
     @Path("/identity")
-    fun createIdentity(request: CreateIdentityRequest): Response
+    fun createIdentity(request: AuthCreateIdentityRequest): Response
 
     @DELETE
     @Path("/identity/{id}")
@@ -31,17 +31,17 @@ interface AuthenticationServiceApi {
 
     @PATCH
     @Path("/identity/{id}/role")
-    fun updateRole(@PathParam("id") id: String, request: UpdateRoleRequest): Response
+    fun updateRole(@PathParam("id") id: String, request: AuthUpdateRoleRequest): Response
 
     @PATCH
     @Path("/identity/{id}/password")
-    fun updatePassword(@PathParam("id") id: String, request: UpdatePasswordRequest): Response
+    fun updatePassword(@PathParam("id") id: String, request: AuthUpdatePasswordRequest): Response
 
     @POST
     @Path("/identity/{id}/pin")
-    fun createPin(@PathParam("id") id: String, request: CreatePinRequest): Response
+    fun createPin(@PathParam("id") id: String, request: AuthCreatePinRequest): Response
 
     @PATCH
     @Path("/identity/{id}/pin")
-    fun updatePin(@PathParam("id") id: String, request: UpdatePinRequest): Response
+    fun updatePin(@PathParam("id") id: String, request: AuthUpdatePinRequest): Response
 }

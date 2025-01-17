@@ -2,7 +2,7 @@ package org.ptss.support.infrastructure.external_services.auth.dtos.requests
 
 import org.ptss.support.domain.enums.Role
 
-data class CreateIdentityRequest(
+data class AuthCreateIdentityRequest(
     val email: String,
     val password: String,
     val role: Role,

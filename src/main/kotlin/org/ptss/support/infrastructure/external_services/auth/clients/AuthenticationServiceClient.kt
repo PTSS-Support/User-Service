@@ -9,7 +9,7 @@ import org.eclipse.microprofile.faulttolerance.CircuitBreaker
 import org.eclipse.microprofile.faulttolerance.Fallback
 import org.eclipse.microprofile.faulttolerance.exceptions.CircuitBreakerOpenException
 import org.ptss.support.infrastructure.external_services.auth.dtos.requests.*
-import org.ptss.support.infrastructure.external_services.auth.dtos.responses.IdentityResponse
+import org.ptss.support.infrastructure.external_services.auth.dtos.responses.AuthIdentityResponse
 import org.ptss.support.infrastructure.external_services.clients.BaseClient
 
 @ApplicationScoped
@@ -19,10 +19,10 @@ class AuthenticationServiceClient @Inject constructor(
 
     private val client: AuthenticationServiceApi by lazy { getClient() }
 
-    override suspend fun login(request: LoginRequest): Array<NewCookie> =
+    override suspend fun login(request: AuthLoginRequest): Array<NewCookie> =
         executeRequest(Array<NewCookie>::class.java) { client.login(request) }
 
-    override suspend fun loginWithPin(request: PinLoginRequest): Array<NewCookie> =
+    override suspend fun loginWithPin(request: AuthPinLoginRequest): Array<NewCookie> =
         executeRequest(Array<NewCookie>::class.java) { client.loginWithPin(request) }
 
     override suspend fun logout() {
@@ -32,10 +32,10 @@ class AuthenticationServiceClient @Inject constructor(
     @CircuitBreaker
     @Bulkhead
     @Fallback(fallbackMethod = "createIdentityFallback")
-    override suspend fun createIdentity(request: CreateIdentityRequest): IdentityResponse =
-        executeRequest(IdentityResponse::class.java) { client.createIdentity(request) }
+    override suspend fun createIdentity(request: AuthCreateIdentityRequest): AuthIdentityResponse =
+        executeRequest(AuthIdentityResponse::class.java) { client.createIdentity(request) }
 
-    private suspend fun createIdentityFallback(request: CreateIdentityRequest): IdentityResponse {
+    private suspend fun createIdentityFallback(request: AuthCreateIdentityRequest): AuthIdentityResponse {
         throw CircuitBreakerOpenException("Identity creation temporarily unavailable")
     }
 
@@ -53,22 +53,22 @@ class AuthenticationServiceClient @Inject constructor(
     @CircuitBreaker
     @Bulkhead
     @Fallback(fallbackMethod = "updateRoleFallback")
-    override suspend fun updateRole(id: String, request: UpdateRoleRequest): IdentityResponse =
-        executeRequest(IdentityResponse::class.java) { client.updateRole(id, request) }
+    override suspend fun updateRole(id: String, request: AuthUpdateRoleRequest): AuthIdentityResponse =
+        executeRequest(AuthIdentityResponse::class.java) { client.updateRole(id, request) }
 
-    private suspend fun updateRoleFallback(id: String, request: UpdateRoleRequest): IdentityResponse {
+    private suspend fun updateRoleFallback(id: String, request: AuthUpdateRoleRequest): AuthIdentityResponse {
         throw CircuitBreakerOpenException("Role update temporarily unavailable")
     }
 
-    override suspend fun updatePassword(id: String, request: UpdatePasswordRequest) {
+    override suspend fun updatePassword(id: String, request: AuthUpdatePasswordRequest) {
         executeRequest(Unit::class.java) { client.updatePassword(id, request) }
     }
 
-    override suspend fun createPin(id: String, request: CreatePinRequest) {
+    override suspend fun createPin(id: String, request: AuthCreatePinRequest) {
         executeRequest(Unit::class.java) { client.createPin(id, request) }
     }
 
-    override suspend fun updatePin(id: String, request: UpdatePinRequest) {
+    override suspend fun updatePin(id: String, request: AuthUpdatePinRequest) {
         executeRequest(Unit::class.java) { client.updatePin(id, request) }
     }
 }
