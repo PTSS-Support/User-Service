@@ -1,27 +1,26 @@
 package org.ptss.support.core.facades
 
+import io.quarkus.logging.Log
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 import jakarta.ws.rs.core.NewCookie
 import org.ptss.support.api.dtos.requests.auth.*
 import org.ptss.support.domain.interfaces.facades.IAuthFacade
+import org.ptss.support.infrastructure.external_services.auth.clients.IAuthenticationServiceClient
+import org.ptss.support.infrastructure.external_services.auth.dtos.requests.toExternalDto
 import org.ptss.support.infrastructure.util.executeWithExceptionLoggingAsync
-import io.quarkus.logging.Log
+import org.ptss.support.security.context.AuthenticatedUserContext
 
 @ApplicationScoped
 class AuthFacade @Inject constructor(
-    // TODO: Inject AuthenticationServiceClient once it's created
+    private val authenticationServiceClient: IAuthenticationServiceClient,
+    private val userContext: AuthenticatedUserContext
 ) : IAuthFacade {
 
     override suspend fun login(request: LoginRequest): Array<NewCookie> {
         return executeWithExceptionLoggingAsync(
             operation = {
-                // TODO: Make a call to the authentication service for login
-                // The authentication service should handle the validation and return the appropriate cookies
-                // Example structure of what needs to be implemented:
-                // val response = authenticationServiceClient.login(request)
-                // return response.cookies
-                emptyArray()
+                authenticationServiceClient.login(request.toExternalDto())
             },
             logMessage = "Failed to login user with email: ${request.email}"
         )
@@ -30,13 +29,7 @@ class AuthFacade @Inject constructor(
     override suspend fun loginWithPin(request: PinLoginRequest): Array<NewCookie> {
         return executeWithExceptionLoggingAsync(
             operation = {
-                // TODO: Make a call to the authentication service for PIN login
-                // The authentication service should validate the PIN and refresh token from cookies
-                // and return new cookies if successful
-                // Example structure:
-                // val response = authenticationServiceClient.loginWithPin(request)
-                // return response.cookies
-                emptyArray()
+                authenticationServiceClient.loginWithPin(request.toExternalDto())
             },
             logMessage = "Failed to login user with PIN"
         )
@@ -46,9 +39,7 @@ class AuthFacade @Inject constructor(
         executeWithExceptionLoggingAsync(
             operation = {
                 try {
-                    // TODO: Make a call to the authentication service to invalidate the session
-                    // Example:
-                    // authenticationServiceClient.logout()
+                    authenticationServiceClient.logout()
                 } catch (ex: Exception) {
                     // Silently catch all exceptions as per requirements
                     Log.warn("Failed to logout user, but continuing as per requirements", ex)
@@ -61,9 +52,14 @@ class AuthFacade @Inject constructor(
     override suspend fun createPin(request: PinCreateRequest) {
         executeWithExceptionLoggingAsync(
             operation = {
-                // TODO: Make a call to the authentication service to create the PIN
-                // Example:
-                // authenticationServiceClient.createPin(request)
+                val user = userContext.getCurrentUser()
+                if (user.hasPin) {
+                    throw IllegalStateException("PIN already exists for this user")
+                }
+                authenticationServiceClient.createPin(
+                    id = user.userId.toString(),
+                    request = request.toExternalDto()
+                )
             },
             logMessage = "Failed to create PIN"
         )
@@ -72,9 +68,14 @@ class AuthFacade @Inject constructor(
     override suspend fun updatePin(request: PinUpdateRequest) {
         executeWithExceptionLoggingAsync(
             operation = {
-                // TODO: Make a call to the authentication service to update the PIN
-                // Example:
-                // authenticationServiceClient.updatePin(request)
+                val user = userContext.getCurrentUser()
+                if (!user.hasPin) {
+                    throw IllegalStateException("Cannot update PIN: No PIN is set for this user")
+                }
+                authenticationServiceClient.updatePin(
+                    id = user.userId.toString(),
+                    request = request.toExternalDto()
+                )
             },
             logMessage = "Failed to update PIN"
         )
@@ -83,9 +84,11 @@ class AuthFacade @Inject constructor(
     override suspend fun updatePassword(request: PasswordUpdateRequest) {
         executeWithExceptionLoggingAsync(
             operation = {
-                // TODO: Make a call to the authentication service to update the password
-                // Example:
-                // authenticationServiceClient.updatePassword(request)
+                val user = userContext.getCurrentUser()
+                authenticationServiceClient.updatePassword(
+                    id = user.userId.toString(),
+                    request = request.toExternalDto()
+                )
             },
             logMessage = "Failed to update password"
         )
