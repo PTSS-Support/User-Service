@@ -16,4 +16,14 @@ interface IAuthenticationServiceClient {
     suspend fun updatePassword(id: String, request: AuthUpdatePasswordRequest)
     suspend fun createPin(id: String, request: AuthCreatePinRequest)
     suspend fun updatePin(id: String, request: AuthUpdatePinRequest)
+
+    suspend fun getIdentityByEmail(email: String): AuthIdentityResponse {
+        // TODO: Implement when Authentication Service adds this endpoint
+        throw NotImplementedError("getIdentityByEmail endpoint not yet implemented in Authentication Service")
+    }
+
+    suspend fun resetPassword(request: AuthResetPasswordRequest) {
+        // TODO: Implement when Authentication Service adds this endpoint
+        throw NotImplementedError("resetPassword endpoint not yet implemented in Authentication Service")
+    }
 }
