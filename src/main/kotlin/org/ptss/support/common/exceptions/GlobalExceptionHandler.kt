@@ -59,7 +59,8 @@ class GlobalExceptionHandler @Inject constructor(
 
             is NotFoundException -> {
                 val message = exception.message ?: "Resource not found: ${exception.response.status}"
-                Log.error("Resource not found: $requestId: $message")
+                val path = requestContextService.getCurrentPath()  // You already have this
+                Log.error("Resource not found at path: $path, requestId: $requestId, message: $message")
                 createResponse(
                     errorCode = ErrorCode.NOT_FOUND,
                     message = message,
