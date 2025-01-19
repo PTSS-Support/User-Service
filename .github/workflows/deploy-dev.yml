@@ -9,10 +9,16 @@ on:
         description: 'Image tag (optional)'
         required: false
         default: 'latest'
+      existing_image:
+        description: 'Use existing image (optional)'
+        type: boolean
+        required: false
+        default: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'workflow_dispatch' || !github.event.inputs.existing_image }}
     outputs:
       artifact_name: ${{ steps.repo_name.outputs.artifact_name }}
     steps:
@@ -58,9 +64,10 @@ jobs:
         with:
           name: ${{ steps.repo_name.outputs.artifact_name }}
           path: build/quarkus-app/
-      
+
   package:
     needs: build
+    if: ${{ github.event_name != 'workflow_dispatch' || !github.event.inputs.existing_image }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -90,21 +97,39 @@ jobs:
           else
             echo "version=$(date +'%Y%m%d')-${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
           fi
-      
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.PACKAGE_PAT }}
-      
+
       - name: Build and Push Docker Image
         run: |
           docker build -t ghcr.io/${{ steps.repo_name.outputs.name }}:${{ steps.generate_tag.outputs.version }} .
           docker push ghcr.io/${{ steps.repo_name.outputs.name }}:${{ steps.generate_tag.outputs.version }}
-      
+
+  set-deployment-vars:
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.set_vars.outputs.image_tag }}
+      repo_name: ${{ steps.set_vars.outputs.repo_name }}
+    steps:
+      - name: Set Variables
+        id: set_vars
+        run: |
+          if [ "${{ github.event.inputs.existing_image }}" = "true" ]; then
+            echo "image_tag=${{ github.event.inputs.tag }}" >> $GITHUB_OUTPUT
+            echo "repo_name=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+          else
+            echo "image_tag=${{ needs.package.outputs.image_tag }}" >> $GITHUB_OUTPUT
+            echo "repo_name=${{ needs.package.outputs.repo_name }}" >> $GITHUB_OUTPUT
+          fi
+
   deploy:
-    needs: package
+    needs: [set-deployment-vars]
+    if: always()
     runs-on: ubuntu-latest
     environment: development
     outputs:
@@ -122,12 +147,12 @@ jobs:
           curl -LO https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz
           tar -xvf openshift-client-linux.tar.gz -C /usr/local/bin
           chmod +x /usr/local/bin/oc
-        
+
       - name: Install Helm
         uses: azure/setup-helm@v3
         with:
           version: v3.12.0
-        
+
       - name: Login to OpenShift
         run: |
           oc login --token=${{ secrets.OSC_DEV_TOKEN }} --server=${{ secrets.OSC_SERVER }}
@@ -168,8 +193,8 @@ jobs:
             --namespace ${{ vars.OSC_DEV_PROJECT }} \
             --values ./helm/values-dev.yaml \
             --set image.registry=ghcr.io \
-            --set image.repository=${{ needs.package.outputs.repo_name }} \
-            --set image.tag=${{ needs.package.outputs.image_tag }} \
+            --set image.repository=${{ needs.set-deployment-vars.outputs.repo_name }} \
+            --set image.tag=${{ needs.set-deployment-vars.outputs.image_tag }} \
             --set route.host=${{ steps.route_host.outputs.name  }}
 
       - name: Wait for Deployment
