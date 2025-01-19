@@ -11,10 +11,10 @@ replicaCount: 1
 
 resources:
   limits:
-    cpu: 200m
+    cpu: 150m
     memory: 512Mi
   requests:
-    cpu: 100m
+    cpu: 30m
     memory: 256Mi
 
 ports:
@@ -38,7 +38,7 @@ readinessProbe:
    path: /q/health/ready
    port: http
  initialDelaySeconds: 10
- periodSeconds: 10
+ periodSeconds: 5
  timeoutSeconds: 2
  failureThreshold: 3
  successThreshold: 1
