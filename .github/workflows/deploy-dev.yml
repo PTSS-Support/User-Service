@@ -6,19 +6,18 @@ on:
   workflow_dispatch:  # Manual trigger
     inputs:
       tag:
-        description: 'Image tag (optional)'
+        description: 'Image tag for new build (optional)'
         required: false
         default: 'latest'
-      existing_image:
-        description: 'Use existing image (optional)'
-        type: boolean
+      existing_tag:
+        description: 'Existing image tag to deploy (e.g., 20250112-6af1898)'
         required: false
-        default: false
+        type: string
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name != 'workflow_dispatch' || !github.event.inputs.existing_image }}
+    if: ${{ github.event.inputs.existing_tag == '' || github.event_name == 'push' }}
     outputs:
       artifact_name: ${{ steps.repo_name.outputs.artifact_name }}
     steps:
@@ -67,7 +66,7 @@ jobs:
 
   package:
     needs: build
-    if: ${{ github.event_name != 'workflow_dispatch' || !github.event.inputs.existing_image }}
+    if: ${{ github.event.inputs.existing_tag == '' || github.event_name == 'push' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -110,25 +109,8 @@ jobs:
           docker build -t ghcr.io/${{ steps.repo_name.outputs.name }}:${{ steps.generate_tag.outputs.version }} .
           docker push ghcr.io/${{ steps.repo_name.outputs.name }}:${{ steps.generate_tag.outputs.version }}
 
-  set-deployment-vars:
-    runs-on: ubuntu-latest
-    outputs:
-      image_tag: ${{ steps.set_vars.outputs.image_tag }}
-      repo_name: ${{ steps.set_vars.outputs.repo_name }}
-    steps:
-      - name: Set Variables
-        id: set_vars
-        run: |
-          if [ "${{ github.event.inputs.existing_image }}" = "true" ]; then
-            echo "image_tag=${{ github.event.inputs.tag }}" >> $GITHUB_OUTPUT
-            echo "repo_name=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
-          else
-            echo "image_tag=${{ needs.package.outputs.image_tag }}" >> $GITHUB_OUTPUT
-            echo "repo_name=${{ needs.package.outputs.repo_name }}" >> $GITHUB_OUTPUT
-          fi
-
   deploy:
-    needs: [set-deployment-vars]
+    needs: [package]
     if: always()
     runs-on: ubuntu-latest
     environment: development
@@ -141,6 +123,18 @@ jobs:
         id: app_name
         run: |
           echo "name=$(echo ${{ github.event.repository.name }} | tr '[:upper:]' '[:lower:]' | tr '_' '-')" >> $GITHUB_OUTPUT
+
+      - name: Set Image Info
+        id: image_info
+        run: |
+          if [ "${{ github.event.inputs.existing_tag }}" != "" ]; then
+            # Use existing image tag
+            echo "tag=${{ github.event.inputs.existing_tag }}" >> $GITHUB_OUTPUT
+          else
+            # Use newly built image tag
+            echo "tag=${{ needs.package.outputs.image_tag }}" >> $GITHUB_OUTPUT
+          fi
+          echo "repo_name=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
 
       - name: Install OpenShift CLI
         run: |
@@ -193,9 +187,9 @@ jobs:
             --namespace ${{ vars.OSC_DEV_PROJECT }} \
             --values ./helm/values-dev.yaml \
             --set image.registry=ghcr.io \
-            --set image.repository=${{ needs.set-deployment-vars.outputs.repo_name }} \
-            --set image.tag=${{ needs.set-deployment-vars.outputs.image_tag }} \
-            --set route.host=${{ steps.route_host.outputs.name  }}
+            --set image.repository=${{ steps.image_info.outputs.repo_name }} \
+            --set image.tag=${{ steps.image_info.outputs.tag }} \
+            --set route.host=${{ steps.route_host.outputs.name }}
 
       - name: Wait for Deployment
         run: |
