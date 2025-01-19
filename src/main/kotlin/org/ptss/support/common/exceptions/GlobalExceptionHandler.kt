@@ -59,35 +59,11 @@ class GlobalExceptionHandler @Inject constructor(
 
             is NotFoundException -> {
                 val message = exception.message ?: "Resource not found: ${exception.response.status}"
-                val path = requestContextService.getCurrentPath()
-
-                // Create a constraints map with detailed request information
-                val requestDetails = mapOf(
-                    "path" to (path.ifEmpty { "empty_path" }),
-                    "timestamp" to java.time.Instant.now().toString(),
-                    "error_details" to message
-                )
-
-                Log.error("""
-                    Resource not found details:
-                    - Path: $path
-                    - Request ID: $requestId
-                    - Error: $message
-                    - Timestamp: ${requestDetails["timestamp"]}
-                    - Thread: ${Thread.currentThread().name}
-                    - Exception type: ${exception.javaClass.simpleName}
-                """.trimIndent())
-
+                Log.error("Resource not found: $requestId: $message")
                 createResponse(
                     errorCode = ErrorCode.NOT_FOUND,
                     message = message,
-                    requestId = requestId,
-                    details = ErrorDetails(
-                        field = path,
-                        constraint = "PATH_NOT_FOUND",
-                        constraints = requestDetails,
-                        value = path
-                    )
+                    requestId = requestId
                 )
             }
 
