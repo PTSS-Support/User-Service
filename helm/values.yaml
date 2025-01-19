@@ -38,7 +38,7 @@ readinessProbe:
    path: /q/health/ready
    port: http
  initialDelaySeconds: 10
- periodSeconds: 5
+ periodSeconds: 10
  timeoutSeconds: 2
  failureThreshold: 3
  successThreshold: 1
