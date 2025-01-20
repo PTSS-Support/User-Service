@@ -13,9 +13,11 @@ import org.ptss.support.infrastructure.external_services.auth.dtos.responses.Aut
 import org.ptss.support.infrastructure.external_services.clients.BaseClient
 
 @ApplicationScoped
-class AuthenticationServiceClient @Inject constructor(
+class AuthenticationServiceClient(
     @ConfigProperty(name = "auth.service.url") baseUrl: String
 ) : BaseClient(baseUrl), IAuthenticationServiceClient {
+    // No-args constructor for CDI
+    constructor() : this("")
 
     private val client: AuthenticationServiceApi by lazy { getClient() }
 

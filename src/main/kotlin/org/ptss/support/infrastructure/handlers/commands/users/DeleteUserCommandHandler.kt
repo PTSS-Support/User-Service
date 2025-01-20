@@ -11,24 +11,39 @@ import kotlinx.coroutines.withContext
 import org.ptss.support.domain.commands.users.DeleteUserCommand
 import org.ptss.support.domain.enums.Role
 import org.ptss.support.domain.interfaces.commands.users.IDeleteUserCommandHandler
+import org.ptss.support.infrastructure.external_services.auth.clients.IAuthenticationServiceClient
 import org.ptss.support.infrastructure.persistence.entities.GroupEntity
 import org.ptss.support.infrastructure.persistence.entities.GroupFamilyMemberEntity
 import org.ptss.support.infrastructure.persistence.entities.UserEntity
+import org.ptss.support.infrastructure.util.executeWithExceptionLoggingAsync
 import org.ptss.support.security.context.AuthenticatedUserContext
+import java.util.UUID
 
 @ApplicationScoped
 class DeleteUserCommandHandler(
-    private val userContext: AuthenticatedUserContext
+    private val userContext: AuthenticatedUserContext,
+    private val authenticationServiceClient: IAuthenticationServiceClient
 ) : IDeleteUserCommandHandler {
 
-    override suspend fun handleAsync(command: DeleteUserCommand) =
-        withContext(Dispatchers.IO) {
+    override suspend fun handleAsync(command: DeleteUserCommand) {
+        // First handle the database operations in IO context
+        val deletedUserKeycloakId = withContext(Dispatchers.IO) {
             handleTransaction(command)
         }
 
+        // Then delete the identity in the authentication service
+        executeWithExceptionLoggingAsync(
+            operation = {
+                authenticationServiceClient.deleteIdentity(deletedUserKeycloakId.toString())
+            },
+            logMessage = "Failed to delete identity in authentication service"
+        )
+    }
+
+
     @Transactional
     @Throws(UnauthorizedException::class)
-    fun handleTransaction(command: DeleteUserCommand) {
+    fun handleTransaction(command: DeleteUserCommand): UUID {
         Log.info("Processing delete user request for userId: ${command.userId}")
         val user = userContext.getCurrentUser()
 
@@ -48,6 +63,9 @@ class DeleteUserCommandHandler(
                 Log.warn("Target user ${command.userId} not found")
                 throw NotFoundException("User not found")
             }
+
+        // Store keycloakId before deletion
+        val keycloakId = targetUser.keycloakId
 
         // Permission check using entity helper
         if (!currentUserEntity.canDelete(targetUser)) {
@@ -71,6 +89,7 @@ class DeleteUserCommandHandler(
         }
 
         Log.info("Successfully deleted user ${targetUser.id}")
+        return keycloakId
     }
 
     private fun deletePatient(patient: UserEntity) {
