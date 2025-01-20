@@ -26,15 +26,6 @@ class AuthFacade @Inject constructor(
         )
     }
 
-    override suspend fun loginWithPin(request: PinLoginRequest): Array<NewCookie> {
-        return executeWithExceptionLoggingAsync(
-            operation = {
-                authenticationServiceClient.loginWithPin(request.toExternalDto())
-            },
-            logMessage = "Failed to login user with PIN"
-        )
-    }
-
     override suspend fun logout() {
         executeWithExceptionLoggingAsync(
             operation = {

@@ -24,9 +24,6 @@ class AuthenticationServiceClient(
     override suspend fun login(request: AuthLoginRequest): Array<NewCookie> =
         executeRequest(Array<NewCookie>::class.java) { client.login(request) }
 
-    override suspend fun loginWithPin(request: AuthPinLoginRequest): Array<NewCookie> =
-        executeRequest(Array<NewCookie>::class.java) { client.loginWithPin(request) }
-
     override suspend fun logout() {
         executeRequest(Unit::class.java) { client.logout() }
     }

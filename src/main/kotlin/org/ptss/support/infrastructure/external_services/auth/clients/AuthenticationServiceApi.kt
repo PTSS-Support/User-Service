@@ -14,10 +14,6 @@ interface AuthenticationServiceApi {
     fun login(request: AuthLoginRequest): Response
 
     @POST
-    @Path("/login/pin")
-    fun loginWithPin(request: AuthPinLoginRequest): Response
-
-    @POST
     @Path("/logout")
     fun logout(): Response
 

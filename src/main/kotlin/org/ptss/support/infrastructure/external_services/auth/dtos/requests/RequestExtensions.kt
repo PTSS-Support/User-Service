@@ -8,10 +8,6 @@ fun LoginRequest.toExternalDto() = AuthLoginRequest(
     password = this.password
 )
 
-fun PinLoginRequest.toExternalDto() = AuthPinLoginRequest(
-    pin = this.pin
-)
-
 fun PinCreateRequest.toExternalDto() = AuthCreatePinRequest(
     pin = this.pin
 )

@@ -29,21 +29,6 @@ interface IAuthController {
     suspend fun login(@Valid request: LoginRequest): Response
 
     @POST
-    @Path("/login/pin")
-    @Operation(summary = "Login with PIN, only requires a valid refresh token from cookies")
-    @APIResponses(
-        APIResponse(
-            responseCode = "200",
-            description = "Login successful",
-        ),
-        APIResponse(
-            responseCode = "401",
-            description = "Unauthorized"
-        )
-    )
-    suspend fun loginWithPin(@Valid request: PinLoginRequest): Response
-
-    @POST
     @Path("/me/logout")
     @Operation(summary = "User logout", description = "Invalidates the user's session in Keycloak")
     @APIResponses(

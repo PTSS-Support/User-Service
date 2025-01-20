@@ -19,11 +19,6 @@ class AuthController @Inject constructor(
         return Response.ok().cookie(*cookies).build()
     }
 
-    override suspend fun loginWithPin(request: PinLoginRequest): Response {
-        val cookies = authFacade.loginWithPin(request)
-        return Response.ok().cookie(*cookies).build()
-    }
-
     @Authentication(roles = [Role.ADMIN, Role.PATIENT, Role.PRIMARY_CAREGIVER, Role.FAMILY_MEMBER, Role.HCP])
     override suspend fun logout(): Response {
         authFacade.logout()

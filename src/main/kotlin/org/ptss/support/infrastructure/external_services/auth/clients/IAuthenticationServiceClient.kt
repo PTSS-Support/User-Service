@@ -6,7 +6,6 @@ import org.ptss.support.infrastructure.external_services.auth.dtos.responses.Aut
 
 interface IAuthenticationServiceClient {
     suspend fun login(request: AuthLoginRequest): Array<NewCookie>
-    suspend fun loginWithPin(request: AuthPinLoginRequest): Array<NewCookie>
     suspend fun logout()
 
     // Identity management
