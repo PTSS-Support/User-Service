@@ -48,8 +48,8 @@ class UserEntity : BaseEntity() {
 
     private fun canHcpDelete(targetUser: UserEntity): Boolean {
         return targetUser.role == Role.PATIENT &&
-                targetUser.groupFamilyMemberships
-                    .any { it.group.healthcareProfessional.id == this.id }
+                GroupEntity.find("healthcareProfessional = ?1 and patient = ?2",
+                    this, targetUser).count() > 0
     }
 
     private fun canPatientDelete(targetUser: UserEntity): Boolean {
