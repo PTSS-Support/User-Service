@@ -28,11 +28,14 @@ class RegisterUserCommandHandler(
             validateInvitation(command.invitationCode)
         }
 
+        val userId = UUID.randomUUID()
+
         // Create identity in authentication service
         val identity = executeWithExceptionLoggingAsync(
             operation = {
                 authenticationServiceClient.createIdentity(
                     AuthCreateIdentityRequest(
+                        userId = userId.toString(),
                         email = invitation.email,
                         password = command.password,
                         role = invitation.role,
@@ -47,7 +50,7 @@ class RegisterUserCommandHandler(
 
         // Create user in our database
         return withContext(Dispatchers.IO) {
-            createUser(command, invitation, identity.id)
+            createUser(command, invitation, userId, identity.id)
         }
     }
 
@@ -66,9 +69,11 @@ class RegisterUserCommandHandler(
     fun createUser(
         command: RegisterUserCommand,
         invitation: InvitationEntity,
+        userId: UUID,
         keycloakId: String
     ): User {
         val user = UserEntity().apply {
+            id = userId
             this.keycloakId = UUID.fromString(keycloakId)
             firstName = command.firstName
             lastName = command.lastName
