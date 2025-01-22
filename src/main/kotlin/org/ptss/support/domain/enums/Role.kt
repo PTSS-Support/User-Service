@@ -1,7 +1,7 @@
 package org.ptss.support.domain.enums
 
 enum class Role {
-    ADMIN, PATIENT, HCP, FAMILY_MEMBER, PRIMARY_CAREGIVER;
+    ADMIN, PATIENT, HEALTHCARE_PROFESSIONAL, FAMILY_MEMBER, PRIMARY_CAREGIVER;
 
     companion object {
         fun fromString(value: String): Role =

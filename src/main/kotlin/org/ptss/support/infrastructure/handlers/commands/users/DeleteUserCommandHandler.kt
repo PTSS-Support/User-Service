@@ -80,7 +80,7 @@ class DeleteUserCommandHandler(
                 Role.PATIENT -> deletePatient(targetUser)
                 Role.PRIMARY_CAREGIVER -> deletePrimaryCaregiver(targetUser)
                 Role.FAMILY_MEMBER -> deleteFamilyMember(targetUser)
-                Role.HCP -> deleteHealthcareProfessional(targetUser)
+                Role.HEALTHCARE_PROFESSIONAL -> deleteHealthcareProfessional(targetUser)
                 Role.ADMIN -> deleteAdmin(targetUser)
             }
         } catch (e: OptimisticLockException) {

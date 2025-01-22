@@ -98,7 +98,7 @@ class TokenUserExtractor @Inject constructor(
 
     private fun extractRole(jwt: JsonWebToken): Set<Role> {
         val specificRole = jwt.getClaim<String>("role")?.let {
-            runCatching { Role.fromString(it.trim()) }.getOrNull()
+            runCatching { Role.fromString(it.trim()) }.getOrNull().also { Log.info("Extracted specific role: $it") }
         }
 
         // Then, extract any system roles from the "roles" array

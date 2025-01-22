@@ -1,5 +1,6 @@
 package org.ptss.support.infrastructure.external_services.clients
 
+import jakarta.ws.rs.core.NewCookie
 import jakarta.ws.rs.core.Response
 import org.eclipse.microprofile.rest.client.RestClientBuilder
 import java.net.URI
@@ -17,7 +18,14 @@ abstract class BaseClient(private val baseUrl: String) {
         block: suspend () -> Response
     ): T = block().use { response ->
         when (response.statusInfo.family) {
-            Response.Status.Family.SUCCESSFUL -> response.readEntity(responseClass)
+            Response.Status.Family.SUCCESSFUL -> {
+                if (responseClass == Array<NewCookie>::class.java) {
+                    @Suppress("UNCHECKED_CAST")
+                    response.cookies.values.toTypedArray() as T
+                } else {
+                    response.readEntity(responseClass)
+                }
+            }
             else -> throw RuntimeException("Request failed with status: ${response.status}")
         }
     }

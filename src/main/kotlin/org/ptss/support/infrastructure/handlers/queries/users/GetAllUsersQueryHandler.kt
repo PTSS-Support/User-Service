@@ -9,10 +9,19 @@ import org.ptss.support.infrastructure.persistence.entities.UserEntity
 import org.ptss.support.infrastructure.persistence.entities.toModel
 import io.quarkus.panache.common.Sort
 import io.quarkus.logging.Log
+import jakarta.transaction.Transactional
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @ApplicationScoped
 class GetAllUsersQueryHandler : IGetAllUsersQueryHandler {
-    override suspend fun handleAsync(query: GetAllUsersQuery): CursorPage<User> {
+    override suspend fun handleAsync(query: GetAllUsersQuery): CursorPage<User> =
+        withContext(Dispatchers.IO) {
+            handleTransaction(query)
+        }
+
+    @Transactional
+    fun handleTransaction(query: GetAllUsersQuery): CursorPage<User> {
         Log.debug("Fetching users page with limit: ${query.limit}, cursor: ${query.cursor}")
 
         val users = if (query.cursor != null) {

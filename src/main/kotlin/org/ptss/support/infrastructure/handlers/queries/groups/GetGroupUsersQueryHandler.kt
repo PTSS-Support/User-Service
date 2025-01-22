@@ -8,10 +8,17 @@ import org.ptss.support.domain.models.User
 import org.ptss.support.infrastructure.persistence.entities.GroupEntity
 import org.ptss.support.infrastructure.persistence.entities.toModel
 import jakarta.ws.rs.NotFoundException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @ApplicationScoped
 class GetGroupUsersQueryHandler : IGetGroupUsersQueryHandler {
-    override suspend fun handleAsync(query: GetGroupUsersQuery): List<User> {
+    override suspend fun handleAsync(query: GetGroupUsersQuery): List<User> =
+        withContext(Dispatchers.IO) {
+            handleTransaction(query)
+        }
+
+    fun handleTransaction(query: GetGroupUsersQuery): List<User> {
         Log.debug("Fetching all users for group ID: ${query.groupId}")
 
         val group = GroupEntity.findById(query.groupId)
