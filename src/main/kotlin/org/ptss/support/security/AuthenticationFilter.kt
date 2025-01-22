@@ -68,8 +68,8 @@ class AuthenticationFilter @Inject constructor(
     // Just a little extra line of defense
     // See Defense in depth: https://en.wikipedia.org/wiki/Defense_in_depth_(computing)
     private fun validateGroupIdConstraints(context: UserContext) {
-        val isAdminOrHCP = context.roles.any { it == Role.ADMIN || it == Role.HCP }
-        if (!isAdminOrHCP && context.groupId == null) {
+        val isAdminOrHEALTHCAREPROFESSIONAL = context.roles.any { it == Role.ADMIN || it == Role.HEALTHCARE_PROFESSIONAL }
+        if (!isAdminOrHEALTHCAREPROFESSIONAL && context.groupId == null) {
             Log.error("User with roles \"${context.roles}\" does not have a group id")
             throw UnauthorizedException(MISSING_GROUP)
         }

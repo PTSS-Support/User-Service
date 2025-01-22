@@ -12,30 +12,69 @@ import jakarta.ws.rs.BadRequestException
 import jakarta.transaction.Transactional
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.ptss.support.infrastructure.external_services.auth.clients.IAuthenticationServiceClient
+import org.ptss.support.infrastructure.external_services.auth.dtos.requests.AuthCreateIdentityRequest
+import org.ptss.support.infrastructure.util.executeWithExceptionLoggingAsync
 import java.util.UUID
 
 @ApplicationScoped
-class RegisterUserCommandHandler : IRegisterUserCommandHandler {
+class RegisterUserCommandHandler(
+    private val authenticationServiceClient: IAuthenticationServiceClient
+) : IRegisterUserCommandHandler {
 
-    override suspend fun handleAsync(command: RegisterUserCommand) =
-        withContext(Dispatchers.IO) {
-            handleTransaction(command)
+    override suspend fun handleAsync(command: RegisterUserCommand): User {
+        // First validate the invitation
+        val invitation = withContext(Dispatchers.IO) {
+            validateInvitation(command.invitationCode)
         }
 
-    @Transactional
-    fun handleTransaction(command: RegisterUserCommand): User {
-        Log.debug("Attempting to register user with invitation code: ${command.invitationCode}")
+        val userId = UUID.randomUUID()
 
-        val invitation = InvitationEntity
+        // Create identity in authentication service
+        val identity = executeWithExceptionLoggingAsync(
+            operation = {
+                authenticationServiceClient.createIdentity(
+                    AuthCreateIdentityRequest(
+                        userId = userId.toString(),
+                        email = invitation.email,
+                        password = command.password,
+                        role = invitation.role,
+                        groupId = invitation.groupId.toString(),
+                        firstName = command.firstName,
+                        lastName = command.lastName
+                    )
+                )
+            },
+            logMessage = "Failed to create identity in authentication service"
+        )
+
+        // Create user in our database
+        return withContext(Dispatchers.IO) {
+            createUser(command, invitation, userId, identity.id)
+        }
+    }
+
+    @Transactional
+    fun validateInvitation(invitationCode: String): InvitationEntity {
+        return InvitationEntity
             .find("verificationCode = ?1 and isVerified = true and isRegistered = false",
-                command.invitationCode)
+                invitationCode)
             .firstResult()
             ?: throw BadRequestException("Invalid or already used invitation code").also {
-                Log.error("Invalid or already used invitation code: ${command.invitationCode}")
+                Log.error("Invalid or already used invitation code: $invitationCode")
             }
+    }
 
+    @Transactional
+    fun createUser(
+        command: RegisterUserCommand,
+        invitation: InvitationEntity,
+        userId: UUID,
+        keycloakId: String
+    ): User {
         val user = UserEntity().apply {
-            keycloakId = UUID.randomUUID() // TODO: This should be replaced with actual Keycloak integration
+            id = userId
+            this.keycloakId = UUID.fromString(keycloakId)
             firstName = command.firstName
             lastName = command.lastName
             role = invitation.role

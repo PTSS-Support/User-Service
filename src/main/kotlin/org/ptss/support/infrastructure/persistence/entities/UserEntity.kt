@@ -39,7 +39,7 @@ class UserEntity : BaseEntity() {
 
         return when (this.role) {
             Role.ADMIN -> true  // Admin can delete anyone
-            Role.HCP -> canHcpDelete(targetUser)
+            Role.HEALTHCARE_PROFESSIONAL -> canHcpDelete(targetUser)
             Role.PATIENT -> canPatientDelete(targetUser)
             Role.PRIMARY_CAREGIVER -> canPrimaryCaregiverDelete(targetUser)
             Role.FAMILY_MEMBER -> false  // Family members can't delete anyone
@@ -48,8 +48,8 @@ class UserEntity : BaseEntity() {
 
     private fun canHcpDelete(targetUser: UserEntity): Boolean {
         return targetUser.role == Role.PATIENT &&
-                targetUser.groupFamilyMemberships
-                    .any { it.group.healthcareProfessional.id == this.id }
+                GroupEntity.find("healthcareProfessional = ?1 and patient = ?2",
+                    this, targetUser).count() > 0
     }
 
     private fun canPatientDelete(targetUser: UserEntity): Boolean {
@@ -74,7 +74,7 @@ class UserEntity : BaseEntity() {
     fun validateDeletion() {
         when (role) {
             Role.ADMIN -> validateAdminDeletion()
-            Role.HCP -> validateHcpDeletion()
+            Role.HEALTHCARE_PROFESSIONAL -> validateHcpDeletion()
             Role.PATIENT -> validatePatientDeletion()
             Role.PRIMARY_CAREGIVER, Role.FAMILY_MEMBER -> validateFamilyMemberDeletion()
         }

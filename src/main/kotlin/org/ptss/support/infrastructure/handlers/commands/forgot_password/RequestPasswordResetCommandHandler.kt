@@ -12,25 +12,28 @@ import org.ptss.support.domain.interfaces.commands.forgot_password.IRequestPassw
 import org.ptss.support.infrastructure.persistence.entities.PasswordResetEntity
 import org.ptss.support.infrastructure.persistence.entities.UserEntity
 import org.ptss.support.domain.enums.Role
+import org.ptss.support.infrastructure.external_services.auth.clients.IAuthenticationServiceClient
+import org.ptss.support.infrastructure.external_services.auth.dtos.responses.AuthIdentityResponse
 import java.util.UUID
 
 @ApplicationScoped
-class RequestPasswordResetCommandHandler : IRequestPasswordResetCommandHandler {
-    override suspend fun handleAsync(command: RequestPasswordResetCommand): String =
-        withContext(Dispatchers.IO) {
-            handleTransaction(command)
+class RequestPasswordResetCommandHandler(
+    private val authenticationServiceClient: IAuthenticationServiceClient
+) : IRequestPasswordResetCommandHandler {
+    override suspend fun handleAsync(command: RequestPasswordResetCommand): String {
+        val identity = authenticationServiceClient.getIdentityByEmail(command.email)
+
+        return withContext(Dispatchers.IO) {
+            handleTransaction(command, identity)
         }
+    }
 
     @Transactional
-    fun handleTransaction(command: RequestPasswordResetCommand): String {
+    fun handleTransaction(command: RequestPasswordResetCommand, identity: AuthIdentityResponse): String {
         Log.debug("Requesting password reset for email: ${command.email}")
 
-        // TODO: In the future, this will be replaced with a call to the authentication service
-        // to get the keycloakId associated with the email
-        val keycloakId = UUID.fromString("6c29869b-fcd3-4604-a2f3-1d87057c7cbb")
-
         // Check if user exists and has appropriate role
-        val user = UserEntity.find("keycloakId", keycloakId)
+        val user = UserEntity.find("keycloakId", identity.id)
             .firstResult() ?: throw BadRequestException("Invalid email address")
 
         if (user.role !in setOf(Role.PATIENT, Role.PRIMARY_CAREGIVER, Role.FAMILY_MEMBER)) {

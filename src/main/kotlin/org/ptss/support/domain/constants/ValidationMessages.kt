@@ -2,6 +2,7 @@ package org.ptss.support.domain.constants
 
 import org.ptss.support.domain.constants.ValidationConstraints.EMAIL_MAX_LENGTH
 import org.ptss.support.domain.constants.ValidationConstraints.NAME_MAX_LENGTH
+import org.ptss.support.domain.constants.ValidationConstraints.PIN_LENGTH
 import org.ptss.support.domain.constants.ValidationConstraints.VERIFICATION_CODE_LENGTH
 
 // Constants for Validation Messages
@@ -30,6 +31,14 @@ object ValidationMessages {
     const val EMPTY_PASSWORD = "Wachtwoord $EMPTY_NAME"
     const val INVALID_PASSWORD = "Wachtwoord moet minimaal 9 karakters bevatten, waaronder minimaal 1 kleine letter, " +
             "1 hoofdletter, 1 cijfer en 1 speciaal karakter"
+
+    // Pin code validation messages
+    const val EMPTY_PIN_CODE = "Pin $EMPTY_NAME"
+    const val INVALID_PIN_CODE = "Pin moet exact $PIN_LENGTH cijfers bevatten"
+    const val EMPTY_CURRENT_PIN_CODE = "Huidige pin $EMPTY_NAME"
+    const val INVALID_CURRENT_PIN_CODE = "Huidige pin moet exact $PIN_LENGTH cijfers bevatten"
+    const val EMPTY_NEW_PIN_CODE = "Nieuwe pin $EMPTY_NAME"
+    const val INVALID_NEW_PIN_CODE = "Nieuwe pin moet exact $PIN_LENGTH cijfers bevatten"
 
     // Verification code validation messages
     const val EMPTY_INVITATION_VERIFICATION_CODE = "Uitnodigingscode $EMPTY_NAME"

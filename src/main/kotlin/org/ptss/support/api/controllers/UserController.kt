@@ -21,17 +21,17 @@ class UserController @Inject constructor(
         return userFacade.getAllUsers(limit, cursor)
     }
 
-    @Authentication(roles = [Role.ADMIN, Role.HCP, Role.PATIENT, Role.PRIMARY_CAREGIVER, Role.FAMILY_MEMBER])
+    @Authentication(roles = [Role.ADMIN, Role.HEALTHCARE_PROFESSIONAL, Role.PATIENT, Role.PRIMARY_CAREGIVER, Role.FAMILY_MEMBER])
     override suspend fun getCurrentUser(): UserResponse {
         return userFacade.getCurrentUser()
     }
 
-    @Authentication(roles = [Role.ADMIN, Role.HCP])
+    @Authentication(roles = [Role.ADMIN, Role.HEALTHCARE_PROFESSIONAL])
     override suspend fun getUserById(id: UUID): UserResponse {
         return userFacade.getUserById(id)
     }
 
-    @Authentication(roles = [Role.ADMIN, Role.HCP, Role.PATIENT, Role.PRIMARY_CAREGIVER])
+    @Authentication(roles = [Role.ADMIN, Role.HEALTHCARE_PROFESSIONAL, Role.PATIENT, Role.PRIMARY_CAREGIVER])
     override suspend fun deleteUser(id: UUID): Response {
         userFacade.deleteUser(id)
         return Response.noContent().build()
