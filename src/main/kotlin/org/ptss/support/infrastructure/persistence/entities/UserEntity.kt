@@ -81,7 +81,6 @@ class UserEntity : BaseEntity() {
     }
 
     @PreUpdate
-    @PrePersist
     fun validateFinalState() {
         // Skip validation for initial persist when keycloakId is null
         if (keycloakId == null) {
