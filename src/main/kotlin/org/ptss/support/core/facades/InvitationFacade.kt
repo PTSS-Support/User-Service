@@ -3,6 +3,9 @@ package org.ptss.support.core.facades
 import io.quarkus.logging.Log
 import io.quarkus.security.UnauthorizedException
 import jakarta.enterprise.context.ApplicationScoped
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import org.ptss.support.api.dtos.requests.invitations.CreateInvitationRequest
 import org.ptss.support.api.dtos.requests.invitations.UserInvitationVerificationRequest
 import org.ptss.support.api.dtos.requests.invitations.UserRegistrationRequest
@@ -54,17 +57,23 @@ class InvitationFacade(
         val command = request.toCommand()
         val createdUser = registerUserCommandHandler.handleAsync(command)
 
+        // Add a small delay to ensure transaction completion
+        withContext(Dispatchers.IO) {
+            delay(100)  // 100ms delay
+        }
+
         // If the registered user is a patient, assign them to their group
         Log.info("User with role: ${createdUser.role} registered with id: ${createdUser.id}")
         if (createdUser.role == Role.PATIENT) {
             createdUser.groupId?.let { groupId ->
+                Log.info("Assigning patient ${createdUser.id} to group $groupId")
                 assignPatientToGroupCommandHandler.handleAsync(
                     AssignPatientToGroupCommand(
                         groupId = groupId,
                         patientId = createdUser.id
                     )
                 )
-            }
+            } ?: Log.error("Patient ${createdUser.id} has no group ID")
         }
     }
 }

@@ -62,9 +62,16 @@ class RegisterUserCommandHandler(
 
         // Update the user with the keycloak ID in a new transaction
         Log.info("Updating keycloakId ${identity.id} for user ${initialUser.id}}")
-        return withContext(Dispatchers.IO) {
+        val finalUser = withContext(Dispatchers.IO) {
             finalizeUser(initialUser.id, UUID.fromString(identity.id))
         }
+
+        // Verify the user is completely finalized
+        val verifiedUser = withContext(Dispatchers.IO) {
+            verifyUserCreation(finalUser.id)
+        }
+
+        return verifiedUser
     }
 
     @Transactional
@@ -113,6 +120,18 @@ class RegisterUserCommandHandler(
 
         user.keycloakId = keycloakId
         user.persistAndFlush()
+
+        return user.toModel()
+    }
+
+    @Transactional
+    fun verifyUserCreation(userId: UUID): User {
+        val user = UserEntity.findById(userId)
+            ?: throw IllegalStateException("User not found")
+
+        if (user.keycloakId == null) {
+            throw IllegalStateException("User creation failed - keycloakId is null")
+        }
 
         return user.toModel()
     }
