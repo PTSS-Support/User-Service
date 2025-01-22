@@ -14,7 +14,7 @@ resources:
     cpu: 150m
     memory: 512Mi
   requests:
-    cpu: 80m
+    cpu: 30m
     memory: 256Mi
 
 ports:
@@ -37,8 +37,8 @@ autoscaling:
   enabled: true
   minReplicas: 1
   maxReplicas: 3
-  targetCPUUtilizationPercentage: 80
-  targetMemoryUtilizationPercentage: 80
+  targetCPUUtilizationPercentage: 95
+  targetMemoryUtilizationPercentage: 95
 
 readinessProbe:
  httpGet:
