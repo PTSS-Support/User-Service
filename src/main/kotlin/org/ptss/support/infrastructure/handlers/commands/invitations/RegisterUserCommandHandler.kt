@@ -61,6 +61,7 @@ class RegisterUserCommandHandler(
         )
 
         // Update the user with the keycloak ID in a new transaction
+        Log.info("Updating keycloakId ${identity.id} for user ${initialUser.id}}")
         return withContext(Dispatchers.IO) {
             finalizeUser(initialUser.id, UUID.fromString(identity.id))
         }

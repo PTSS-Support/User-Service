@@ -22,7 +22,7 @@ class AssignPatientToGroupCommandHandler : IAssignPatientToGroupCommandHandler {
 
     @Transactional
     fun handleTransaction(command: AssignPatientToGroupCommand) {
-        Log.debug("Attempting to assign patient ${command.patientId} to group ${command.groupId}")
+        Log.info("Attempting to assign patient ${command.patientId} to group ${command.groupId}")
 
         val group = GroupEntity.findById(command.groupId)
             ?: throw NotFoundException("Group not found").also {
