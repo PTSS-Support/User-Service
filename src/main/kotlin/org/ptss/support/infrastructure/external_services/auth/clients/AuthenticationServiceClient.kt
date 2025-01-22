@@ -1,5 +1,6 @@
 package org.ptss.support.infrastructure.external_services.auth.clients
 
+import io.quarkus.logging.Log
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 import jakarta.ws.rs.core.NewCookie
@@ -32,8 +33,12 @@ class AuthenticationServiceClient @Inject constructor(
     @CircuitBreaker
     @Bulkhead
     @Fallback(fallbackMethod = "createIdentityFallback")
-    override suspend fun createIdentity(request: AuthCreateIdentityRequest): AuthIdentityResponse =
-        executeRequest(AuthIdentityResponse::class.java) { client.createIdentity(request) }
+    override suspend fun createIdentity(request: AuthCreateIdentityRequest): AuthIdentityResponse {
+        Log.info("Attempting to create identity with request: $request")
+        val response = executeRequest(AuthIdentityResponse::class.java) { client.createIdentity(request) }
+        Log.info("Identity created successfully")
+        return response
+    }
 
     private suspend fun createIdentityFallback(request: AuthCreateIdentityRequest): AuthIdentityResponse {
         throw CircuitBreakerOpenException("Identity creation temporarily unavailable")
@@ -43,7 +48,9 @@ class AuthenticationServiceClient @Inject constructor(
     @Bulkhead
     @Fallback(fallbackMethod = "deleteIdentityFallback")
     override suspend fun deleteIdentity(id: String) {
+        Log.info("Attempting to delete identity with id: $id")
         executeRequest(Unit::class.java) { client.deleteIdentity(id) }
+        Log.info("Identity deleted successfully")
     }
 
     private suspend fun deleteIdentityFallback(id: String) {
@@ -53,8 +60,12 @@ class AuthenticationServiceClient @Inject constructor(
     @CircuitBreaker
     @Bulkhead
     @Fallback(fallbackMethod = "updateRoleFallback")
-    override suspend fun updateRole(id: String, request: AuthUpdateRoleRequest): AuthIdentityResponse =
-        executeRequest(AuthIdentityResponse::class.java) { client.updateRole(id, request) }
+    override suspend fun updateRole(id: String, request: AuthUpdateRoleRequest): AuthIdentityResponse {
+        Log.info("Attempting to update role with id: $id, and request: $request")
+        val response = executeRequest(AuthIdentityResponse::class.java) { client.updateRole(id, request) }
+        Log.info("Identity deleted successfully")
+        return response
+    }
 
     private suspend fun updateRoleFallback(id: String, request: AuthUpdateRoleRequest): AuthIdentityResponse {
         throw CircuitBreakerOpenException("Role update temporarily unavailable")
