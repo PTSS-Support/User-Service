@@ -27,10 +27,12 @@ import org.ptss.support.domain.interfaces.queries.groups.IGetAllGroupsQueryHandl
 import org.ptss.support.domain.interfaces.queries.groups.IGetGroupMembersQueryHandler
 import org.ptss.support.domain.interfaces.queries.groups.IGetGroupUsersQueryHandler
 import org.ptss.support.domain.interfaces.queries.invitations.IGetPendingInvitationsByGroupQueryHandler
+import org.ptss.support.domain.interfaces.services.IEmailService
 import org.ptss.support.domain.queries.groups.GetAllGroupsQuery
 import org.ptss.support.domain.queries.groups.GetGroupMembersQuery
 import org.ptss.support.domain.queries.groups.GetGroupUsersQuery
 import org.ptss.support.domain.queries.invitations.GetPendingInvitationsByGroupQuery
+import org.ptss.support.domain.templates.EmailTemplates
 import org.ptss.support.security.context.AuthenticatedUserContext
 import java.util.UUID
 
@@ -44,6 +46,7 @@ class GroupFacade(
     private val getPendingGroupInvitationsByGroupQueryHandler: IGetPendingInvitationsByGroupQueryHandler,
     private val assignPrimaryCaregiverCommandHandler: IAssignPrimaryCaregiverToGroupCommandHandler,
     private val removePrimaryCaregiverCommandHandler: IRemovePrimaryCaregiverFromGroupCommandHandler,
+    private val emailService: IEmailService,
     private val userContext: AuthenticatedUserContext
 ) : IGroupFacade {
 
@@ -60,7 +63,16 @@ class GroupFacade(
 
         // Then, create an invitation for the patient
         val createInvitationCommand = request.toCreateInvitationCommand(group.id)
-        createInvitationCommandHandler.handleAsync(createInvitationCommand)
+        val invitation = createInvitationCommandHandler.handleAsync(createInvitationCommand)
+
+        // Then, send an email
+        Log.info("Sending invitation email with verificationCode: ${invitation.verificationCode.dropLast(3)}***")
+        emailService.sendEmail(
+            EmailTemplates.invitationEmail(
+                email = invitation.email,
+                verificationCode = invitation.verificationCode
+            )
+        )
 
         return group.toResponse()
     }
