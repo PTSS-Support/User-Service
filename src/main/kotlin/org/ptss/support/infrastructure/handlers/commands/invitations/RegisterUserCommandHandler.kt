@@ -28,11 +28,14 @@ class RegisterUserCommandHandler(
             validateInvitation(command.invitationCode)
         }
 
-        val userId = UUID.randomUUID()
+        // Create user in our database first
+        val user = withContext(Dispatchers.IO) {
+            createUser(command, invitation)
+        }
 
-        // Create identity in authentication service
+        // Then create identity in authentication service using the generated user ID
         Log.info("""Calling identity service client with request: 
-            userId: $userId
+            userId: ${user.id}
             email: ${invitation.email}
             password: ${command.password}
             role: ${invitation.role}
@@ -44,7 +47,7 @@ class RegisterUserCommandHandler(
             operation = {
                 authenticationServiceClient.createIdentity(
                     AuthCreateIdentityRequest(
-                        userId = userId.toString(),
+                        userId = user.id.toString(),
                         email = invitation.email,
                         password = command.password,
                         role = invitation.role,
@@ -57,9 +60,9 @@ class RegisterUserCommandHandler(
             logMessage = "Failed to create identity in authentication service"
         )
 
-        // Create user in our database
+        // Update the user with the keycloak ID
         return withContext(Dispatchers.IO) {
-            createUser(command, invitation, userId, identity.id)
+            updateUserKeycloakId(user.id, identity.id)
         }
     }
 
@@ -78,12 +81,8 @@ class RegisterUserCommandHandler(
     fun createUser(
         command: RegisterUserCommand,
         invitation: InvitationEntity,
-        userId: UUID,
-        keycloakId: String
     ): User {
         val user = UserEntity().apply {
-            id = userId
-            this.keycloakId = UUID.fromString(keycloakId)
             firstName = command.firstName
             lastName = command.lastName
             role = invitation.role
@@ -94,7 +93,18 @@ class RegisterUserCommandHandler(
         invitation.isRegistered = true
         invitation.persistAndFlush()
 
-        Log.info("Successfully registered user: ${user.firstName} ${user.lastName} with role: ${user.role}")
+        Log.info("Successfully created user: ${user.firstName} ${user.lastName} with role: ${user.role}")
+        return user.toModel()
+    }
+
+    @Transactional
+    fun updateUserKeycloakId(userId: UUID, keycloakId: String): User {
+        val user = UserEntity.findById(userId)
+            ?: throw IllegalStateException("User not found")
+
+        user.keycloakId = UUID.fromString(keycloakId)
+        user.persistAndFlush()
+
         return user.toModel()
     }
 }
