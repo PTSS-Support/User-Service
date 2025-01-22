@@ -89,7 +89,7 @@ class DeleteUserCommandHandler(
         }
 
         Log.info("Successfully deleted user ${targetUser.id}")
-        return keycloakId
+        return keycloakId!!
     }
 
     private fun deletePatient(patient: UserEntity) {

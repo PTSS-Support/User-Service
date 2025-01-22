@@ -58,6 +58,6 @@ class RemovePrimaryCaregiverFromGroupCommandHandler(
         group.persistAndFlush()
 
         Log.info("Successfully removed primary caregiver from group ${command.groupId}")
-        return keycloakId
+        return keycloakId!!
     }
 }
