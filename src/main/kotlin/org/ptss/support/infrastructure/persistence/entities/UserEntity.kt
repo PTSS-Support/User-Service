@@ -10,7 +10,7 @@ import org.ptss.support.domain.enums.Role
 @Entity
 @Table(name = "users")
 class UserEntity : BaseEntity() {
-    @Column(nullable = false, unique = true, updatable = false)
+    @Column(nullable = true, unique = true, updatable = false)
     var keycloakId: UUID? = null
 
     @Column(nullable = false, length = NAME_MAX_LENGTH)
