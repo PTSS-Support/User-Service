@@ -31,6 +31,15 @@ class RegisterUserCommandHandler(
         val userId = UUID.randomUUID()
 
         // Create identity in authentication service
+        Log.info("""Calling identity service client with request: 
+            userId: $userId
+            email: ${invitation.email}
+            password: ${command.password}
+            role: ${invitation.role}
+            groupId: ${invitation.groupId}
+            firstName: ${command.firstName}
+            lastName: ${command.lastName}
+        """.trimMargin())
         val identity = executeWithExceptionLoggingAsync(
             operation = {
                 authenticationServiceClient.createIdentity(

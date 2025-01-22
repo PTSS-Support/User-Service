@@ -13,6 +13,7 @@ import org.ptss.support.domain.config.AuthenticationServiceProperties
 import org.ptss.support.infrastructure.external_services.auth.dtos.requests.*
 import org.ptss.support.infrastructure.external_services.auth.dtos.responses.AuthIdentityResponse
 import org.ptss.support.infrastructure.external_services.clients.BaseClient
+import org.ptss.support.infrastructure.util.executeWithExceptionLoggingAsync
 
 @ApplicationScoped
 class AuthenticationServiceClient @Inject constructor(
@@ -34,10 +35,16 @@ class AuthenticationServiceClient @Inject constructor(
     @Bulkhead
     @Fallback(fallbackMethod = "createIdentityFallback")
     override suspend fun createIdentity(request: AuthCreateIdentityRequest): AuthIdentityResponse {
-        Log.info("Attempting to create identity with request: $request")
-        val response = executeRequest(AuthIdentityResponse::class.java) { client.createIdentity(request) }
-        Log.info("Identity created successfully")
-        return response
+        try {
+            return executeRequest(AuthIdentityResponse::class.java) {
+                val response = client.createIdentity(request)
+                Log.info("Create identity response status: ${response.status}")
+                response
+            }
+        } catch (e: Exception) {
+            Log.info("Create identity failed: ${e.message}")
+            throw e
+        }
     }
 
     private suspend fun createIdentityFallback(request: AuthCreateIdentityRequest): AuthIdentityResponse {
