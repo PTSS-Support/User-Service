@@ -18,13 +18,13 @@ class GroupEntityTest : BaseRepositoryTest() {
     fun `should create valid group with all members`() {
         // given
         val patient = createUser(Role.PATIENT)
-        val HEALTHCAREPROFESSIONAL = createUser(Role.HEALTHCARE_PROFESSIONAL)
+        val hcp = createUser(Role.HEALTHCARE_PROFESSIONAL)
         val primaryCaregiver = createUser(Role.FAMILY_MEMBER)
 
         // when
         val group = GroupEntity().apply {
             this.patient = patient
-            this.healthcareProfessional = HEALTHCAREPROFESSIONAL
+            this.healthcareProfessional = hcp
             this.primaryCaregiver = primaryCaregiver
         }
         entityManager.persist(group)
@@ -34,7 +34,7 @@ class GroupEntityTest : BaseRepositoryTest() {
         val savedGroup = GroupEntity.findById(group.id)
         assertNotNull(savedGroup)
         assertEquals(patient.id, savedGroup?.patient?.id)
-        assertEquals(HEALTHCAREPROFESSIONAL.id, savedGroup?.healthcareProfessional?.id)
+        assertEquals(hcp.id, savedGroup?.healthcareProfessional?.id)
         assertEquals(primaryCaregiver.id, savedGroup?.primaryCaregiver?.id)
         assertTrue(savedGroup?.isActive ?: false)
     }
@@ -44,12 +44,12 @@ class GroupEntityTest : BaseRepositoryTest() {
     fun `should create valid group without primary caregiver`() {
         // given
         val patient = createUser(Role.PATIENT)
-        val HEALTHCAREPROFESSIONAL = createUser(Role.HEALTHCARE_PROFESSIONAL)
+        val hcp = createUser(Role.HEALTHCARE_PROFESSIONAL)
 
         // when
         val group = GroupEntity().apply {
             this.patient = patient
-            this.healthcareProfessional = HEALTHCAREPROFESSIONAL
+            this.healthcareProfessional = hcp
         }
         entityManager.persist(group)
         flushAndClear()
@@ -82,12 +82,12 @@ class GroupEntityTest : BaseRepositoryTest() {
     fun `should prevent duplicate patient assignments`() {
         // given
         val patient = createUser(Role.PATIENT)
-        val HEALTHCAREPROFESSIONAL1 = createUser(Role.HEALTHCARE_PROFESSIONAL)
-        val HEALTHCAREPROFESSIONAL2 = createUser(Role.HEALTHCARE_PROFESSIONAL)
+        val hcp1 = createUser(Role.HEALTHCARE_PROFESSIONAL)
+        val hcp2 = createUser(Role.HEALTHCARE_PROFESSIONAL)
 
         val group1 = GroupEntity().apply {
             this.patient = patient
-            this.healthcareProfessional = HEALTHCAREPROFESSIONAL1
+            this.healthcareProfessional = hcp1
         }
         entityManager.persist(group1)
         flushAndClear()
@@ -95,7 +95,7 @@ class GroupEntityTest : BaseRepositoryTest() {
         // when/then
         val group2 = GroupEntity().apply {
             this.patient = patient
-            this.healthcareProfessional = HEALTHCAREPROFESSIONAL2
+            this.healthcareProfessional = hcp2
         }
 
         assertThrows<jakarta.persistence.PersistenceException> {
@@ -109,12 +109,12 @@ class GroupEntityTest : BaseRepositoryTest() {
     fun `should add family members`() {
         // given
         val patient = createUser(Role.PATIENT)
-        val HEALTHCAREPROFESSIONAL = createUser(Role.HEALTHCARE_PROFESSIONAL)
+        val hcp = createUser(Role.HEALTHCARE_PROFESSIONAL)
         val familyMember = createUser(Role.FAMILY_MEMBER)
 
         val group = GroupEntity().apply {
             this.patient = patient
-            this.healthcareProfessional = HEALTHCAREPROFESSIONAL
+            this.healthcareProfessional = hcp
         }
         entityManager.persist(group)
 
@@ -137,12 +137,12 @@ class GroupEntityTest : BaseRepositoryTest() {
     fun `should throw exception when promoting non-family member to primary caregiver`() {
         // given
         val patient = createUser(Role.PATIENT)
-        val HEALTHCAREPROFESSIONAL = createUser(Role.HEALTHCARE_PROFESSIONAL)
+        val hcp = createUser(Role.HEALTHCARE_PROFESSIONAL)
         val nonFamilyMember = createUser(Role.FAMILY_MEMBER)
 
         val group = GroupEntity().apply {
             this.patient = patient
-            this.healthcareProfessional = HEALTHCAREPROFESSIONAL
+            this.healthcareProfessional = hcp
         }
         entityManager.persist(group)
 
@@ -162,12 +162,12 @@ class GroupEntityTest : BaseRepositoryTest() {
     fun `should remove primary caregiver`() {
         // given
         val patient = createUser(Role.PATIENT)
-        val HEALTHCAREPROFESSIONAL = createUser(Role.HEALTHCARE_PROFESSIONAL)
+        val hcp = createUser(Role.HEALTHCARE_PROFESSIONAL)
         val caregiver = createUser(Role.FAMILY_MEMBER)
 
         val group = GroupEntity().apply {
             this.patient = patient
-            this.healthcareProfessional = HEALTHCAREPROFESSIONAL
+            this.healthcareProfessional = hcp
             this.primaryCaregiver = caregiver
         }
         entityManager.persist(group)
