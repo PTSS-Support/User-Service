@@ -2,6 +2,8 @@ package org.ptss.support.infrastructure.handlers.queries.invitations
 
 import io.quarkus.logging.Log
 import jakarta.enterprise.context.ApplicationScoped
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.ptss.support.domain.queries.invitations.GetPendingInvitationsByGroupQuery
 import org.ptss.support.domain.interfaces.queries.invitations.IGetPendingInvitationsByGroupQueryHandler
 import org.ptss.support.domain.models.Invitation
@@ -10,7 +12,12 @@ import org.ptss.support.infrastructure.persistence.entities.toModel
 
 @ApplicationScoped
 class GetPendingInvitationsByGroupQueryHandler : IGetPendingInvitationsByGroupQueryHandler {
-    override suspend fun handleAsync(query: GetPendingInvitationsByGroupQuery): List<Invitation> {
+    override suspend fun handleAsync(query: GetPendingInvitationsByGroupQuery):  List<Invitation> =
+        withContext(Dispatchers.IO) {
+            handleTransaction(query)
+        }
+
+    fun handleTransaction(query: GetPendingInvitationsByGroupQuery): List<Invitation> {
         Log.debug("Fetching pending invitations for group ID: ${query.groupId}")
 
         val invitations = InvitationEntity

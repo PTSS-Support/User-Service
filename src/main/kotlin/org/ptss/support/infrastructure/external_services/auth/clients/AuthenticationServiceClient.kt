@@ -8,16 +8,17 @@ import org.eclipse.microprofile.faulttolerance.Bulkhead
 import org.eclipse.microprofile.faulttolerance.CircuitBreaker
 import org.eclipse.microprofile.faulttolerance.Fallback
 import org.eclipse.microprofile.faulttolerance.exceptions.CircuitBreakerOpenException
+import org.ptss.support.domain.config.AuthenticationServiceProperties
 import org.ptss.support.infrastructure.external_services.auth.dtos.requests.*
 import org.ptss.support.infrastructure.external_services.auth.dtos.responses.AuthIdentityResponse
 import org.ptss.support.infrastructure.external_services.clients.BaseClient
 
 @ApplicationScoped
-class AuthenticationServiceClient(
-    @ConfigProperty(name = "auth.service.url") baseUrl: String
-) : BaseClient(baseUrl), IAuthenticationServiceClient {
+class AuthenticationServiceClient @Inject constructor(
+    private val properties: AuthenticationServiceProperties
+) : BaseClient(properties.baseUrl), IAuthenticationServiceClient {
     // No-args constructor for CDI
-    constructor() : this("")
+    constructor() : this(AuthenticationServiceProperties(""))
 
     private val client: AuthenticationServiceApi by lazy { getClient() }
 

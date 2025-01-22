@@ -9,10 +9,17 @@ import org.ptss.support.infrastructure.persistence.entities.GroupEntity
 import org.ptss.support.infrastructure.persistence.entities.toModel
 import org.ptss.support.common.pagination.CursorPage
 import io.quarkus.panache.common.Sort
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @ApplicationScoped
 class GetAllGroupsQueryHandler : IGetAllGroupsQueryHandler {
-    override suspend fun handleAsync(query: GetAllGroupsQuery): CursorPage<Group> {
+    override suspend fun handleAsync(query: GetAllGroupsQuery): CursorPage<Group> =
+        withContext(Dispatchers.IO) {
+            handleTransaction(query)
+        }
+
+    fun handleTransaction(query: GetAllGroupsQuery): CursorPage<Group> {
         Log.debug("Fetching groups page with limit: ${query.limit}, cursor: ${query.cursor}")
 
         val groups = if (query.cursor != null) {
