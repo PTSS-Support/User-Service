@@ -19,7 +19,7 @@ class AuthController @Inject constructor(
         return Response.ok().cookie(*cookies).build()
     }
 
-    @Authentication(roles = [Role.ADMIN, Role.PATIENT, Role.PRIMARY_CAREGIVER, Role.FAMILY_MEMBER, Role.HCP])
+    @Authentication(roles = [Role.ADMIN, Role.PATIENT, Role.PRIMARY_CAREGIVER, Role.FAMILY_MEMBER, Role.HEALTHCARE_PROFESSIONAL])
     override suspend fun logout(): Response {
         authFacade.logout()
         return Response.noContent().build()

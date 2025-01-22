@@ -103,7 +103,7 @@ class GroupFamilyMemberEntityTest : BaseRepositoryTest() {
 
     private fun createGroup(): GroupEntity {
         val patient = createUser(Role.PATIENT)
-        val hcp = createUser(Role.HCP)
+        val hcp = createUser(Role.HEALTHCARE_PROFESSIONAL)
 
         return GroupEntity().apply {
             this.patient = patient

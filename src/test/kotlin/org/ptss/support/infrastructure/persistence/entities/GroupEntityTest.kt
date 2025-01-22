@@ -18,7 +18,7 @@ class GroupEntityTest : BaseRepositoryTest() {
     fun `should create valid group with all members`() {
         // given
         val patient = createUser(Role.PATIENT)
-        val hcp = createUser(Role.HCP)
+        val hcp = createUser(Role.HEALTHCARE_PROFESSIONAL)
         val primaryCaregiver = createUser(Role.FAMILY_MEMBER)
 
         // when
@@ -44,7 +44,7 @@ class GroupEntityTest : BaseRepositoryTest() {
     fun `should create valid group without primary caregiver`() {
         // given
         val patient = createUser(Role.PATIENT)
-        val hcp = createUser(Role.HCP)
+        val hcp = createUser(Role.HEALTHCARE_PROFESSIONAL)
 
         // when
         val group = GroupEntity().apply {
@@ -82,8 +82,8 @@ class GroupEntityTest : BaseRepositoryTest() {
     fun `should prevent duplicate patient assignments`() {
         // given
         val patient = createUser(Role.PATIENT)
-        val hcp1 = createUser(Role.HCP)
-        val hcp2 = createUser(Role.HCP)
+        val hcp1 = createUser(Role.HEALTHCARE_PROFESSIONAL)
+        val hcp2 = createUser(Role.HEALTHCARE_PROFESSIONAL)
 
         val group1 = GroupEntity().apply {
             this.patient = patient
@@ -109,7 +109,7 @@ class GroupEntityTest : BaseRepositoryTest() {
     fun `should add family members`() {
         // given
         val patient = createUser(Role.PATIENT)
-        val hcp = createUser(Role.HCP)
+        val hcp = createUser(Role.HEALTHCARE_PROFESSIONAL)
         val familyMember = createUser(Role.FAMILY_MEMBER)
 
         val group = GroupEntity().apply {
@@ -137,7 +137,7 @@ class GroupEntityTest : BaseRepositoryTest() {
     fun `should throw exception when promoting non-family member to primary caregiver`() {
         // given
         val patient = createUser(Role.PATIENT)
-        val hcp = createUser(Role.HCP)
+        val hcp = createUser(Role.HEALTHCARE_PROFESSIONAL)
         val nonFamilyMember = createUser(Role.FAMILY_MEMBER)
 
         val group = GroupEntity().apply {
@@ -162,7 +162,7 @@ class GroupEntityTest : BaseRepositoryTest() {
     fun `should remove primary caregiver`() {
         // given
         val patient = createUser(Role.PATIENT)
-        val hcp = createUser(Role.HCP)
+        val hcp = createUser(Role.HEALTHCARE_PROFESSIONAL)
         val caregiver = createUser(Role.FAMILY_MEMBER)
 
         val group = GroupEntity().apply {
