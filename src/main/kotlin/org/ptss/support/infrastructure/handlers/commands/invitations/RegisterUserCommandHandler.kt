@@ -30,7 +30,7 @@ class RegisterUserCommandHandler(
 
         // Create initial user without keycloakId
         val initialUser = withContext(Dispatchers.IO) {
-            createInitialUser(command, invitation)
+            createInitialUser(command, command.invitationCode)
         }
 
         // Then create identity in authentication service using the generated user ID
@@ -80,8 +80,14 @@ class RegisterUserCommandHandler(
     @Transactional
     fun createInitialUser(
         command: RegisterUserCommand,
-        invitation: InvitationEntity,
+        invitationCode: String,
     ): User {
+        // Reload the invitation in this transaction
+        val invitation = InvitationEntity
+            .find("verificationCode", invitationCode)
+            .firstResult()
+            ?: throw BadRequestException("Invalid invitation code")
+
         val user = UserEntity().apply {
             firstName = command.firstName
             lastName = command.lastName
@@ -91,6 +97,7 @@ class RegisterUserCommandHandler(
 
         user.persistAndFlush()
 
+        // Update the invitation in the same transaction where we loaded it
         invitation.isRegistered = true
         invitation.persistAndFlush()
 
@@ -103,7 +110,6 @@ class RegisterUserCommandHandler(
         val user = UserEntity.findById(userId)
             ?: throw IllegalStateException("User not found")
 
-        // Add optimistic locking retry if needed
         user.keycloakId = keycloakId
         user.persistAndFlush()
 
